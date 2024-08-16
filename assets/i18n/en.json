@@ -3,7 +3,8 @@
   "general": {
     "typesValues": {
       "gongType": {
-        "long": "Long"
+        "long": "Long",
+        "gongsingle1": "Single2"
       },
       "areas": {
         "all": "All",
