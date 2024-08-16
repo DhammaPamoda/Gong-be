@@ -12,12 +12,13 @@ RUN npm install pm2 -g
 
 # installing the ftdi drivers
 RUN mkdir ftdi
-# get the file from https://www.ftdichip.com/Drivers/D2XX.htm
-RUN curl https://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.4.8.gz -o /ftdi/libftd2xx-x86_64-1.4.8.gz
-RUN tar xfvz /ftdi/libftd2xx-x86_64-1.4.8.gz -C /ftdi
+
+# https://ftdichip.com/drivers/d2xx-drivers/
+RUN curl https://ftdichip.com/wp-content/uploads/2022/07/libftd2xx-x86_64-1.4.27.tgz -o /ftdi/libftd2xx-x86_64-1.4.27.tgz
+RUN tar xfvz /ftdi/libftd2xx-x86_64-1.4.27.tgz -C /ftdi
 RUN cp /ftdi/release/build/lib* /usr/local/lib || :
-RUN ln -s /usr/local/lib/libftd2xx.so.1.4.8 /usr/local/lib/libftd2xx.so
-RUN chmod 0755 /usr/local/lib/libftd2xx.so
+RUN ln -s /usr/local/lib/libftd2xx.so.1.4.27 /usr/local/lib/libftd2xx.so
+RUN chmod 0755 /usr/local/lib/libftd2xx.so 
 RUN cp /ftdi/release/*.h /usr/local/include/
 RUN rm -fr ftdi
 RUN /sbin/ldconfig -v
