@@ -22,8 +22,8 @@ cd "${BASE_DIR}/"
 export HISTIGNORE='*sudo -S*'
 
 # Getting the FE and BE
-git clone https://github.com/doron-mil/Gong-be.git
-git clone https://github.com/doron-mil/Gong_fe.git
+git clone https://github.com/DhammaPamoda/Gong-be.git
+git clone https://github.com/DhammaPamoda/Gong_fe.git
 
 # Populating the dev_ops
 cp -rf "${BASE_DIR}/Gong-be/dev_ops" "${GONG_DEV_OPS_DIR}/"

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-git clone https://github.com/doron-mil/Gong-be.git ~/Gong-be
+git clone https://github.com/DhammaPamoda/Gong-be.git ~/Gong-be
 cp ~/Gong-be/dev_ops/deploy_gong.sh .
 cp ~/Gong-be/dev_ops/deploy_gong_actions.sh .
 rm -rf Gong-be
