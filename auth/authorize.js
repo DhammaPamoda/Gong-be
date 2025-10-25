@@ -38,7 +38,7 @@ function authorize(roles = []) {
       secret: secretCallback,
       algorithms: ['HS256'],
     })
-      .unless({ path: ['/login', '/nextgong', '/api/login', '/api/nextgong'] }),
+      .unless({ path: ['/login', '/nextgong', '/api/login', '/api/nextgong', '/api/relay/isGongPlaying', '/api/relay/cancelGong', '/api/relay/playGong'] }),
 
     // authorize based on user role
     (err, req, res, next) => {
