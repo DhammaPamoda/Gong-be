@@ -34,7 +34,19 @@
             },
             "courses": {
                 "10_day_course": "10 ימים",
-                "satipattana": "סאטיפטהאנה"
+                "satipattana": "סאטיפטהאנה",
+                "10 days course": "",
+                "10 days special": "",
+                "1DC - ": "",
+                "1DC - 9AM": "",
+                "1DC - Yom Kippur": "",
+                "20 days course": "",
+                "3 day course long 0-4": "",
+                "3 day course short 0-3": "",
+                "ChildTeen": "",
+                "Gardening Summer (2 Days)": "",
+                "Service (2 Days)": "",
+                "Service (7 Days)": ""
             }
         },
         "header": {
