@@ -16,7 +16,9 @@
     "build-server": "babel ./ -s -d ../gong_server --ignore \"build\",\"dist\",\"test\",\"jest\",\"node_modules\"",
     "build": "npm run clean && npm run build-server && npm run copy",
     "start-deployed": "cd ../gong_server && NO_OF_PORTS=8 NODE_ENV=production node ../gong_server/server",
-    "start-nodemon": "nodemon --exec babel-node server"
+    "start-nodemon": "nodemon --exec babel-node server",
+    "debug": "NO_OF_PORTS=8 NODE_ENV=development babel-node --inspect-brk server",
+    "debug-https": "NO_OF_PORTS=8 NODE_ENV=development HTTPS=true babel-node --inspect-brk server"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
