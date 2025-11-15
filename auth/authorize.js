@@ -1,4 +1,4 @@
-const expressJwt = require('express-jwt');
+const { expressjwt: expressJwt } = require('express-jwt');
 const moment = require('moment');
 
 const utilsManager = require('../lib/utilsManager');

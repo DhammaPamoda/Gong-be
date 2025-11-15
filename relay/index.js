@@ -1,5 +1,10 @@
 const { exec } = require('child_process');
-const ftdi = require('ft245rl');
+let ftdi;
+try {
+  ftdi = require('ft245rl');
+} catch (e) {
+  ftdi = null;
+}
 const logger = require('../lib/logger');
 const RunPromiseRoutineInQueue = require('../lib/utils/runPromiseRoutineInQueue');
 const ExecError = require('../model/execError');
@@ -44,6 +49,13 @@ const setOnDeviceListeners = (aDevice) => {
  */
 const findDevice = (aRelaysModuleObject) => {
   const retDevicePromise = new Promise((resolve, reject) => {
+    if (!ftdi) {
+      const error = new Error('ft245rl module is not available. Please install FTDI drivers and rebuild the module.');
+      logger.relayAndSoundManager.error('FTDI module not available', { error });
+      aRelaysModuleObject.setFtdiDevice(null);
+      reject(error);
+      return;
+    }
     ftdi.findFirst().then((device) => {
       const { description, serialNumber, vendorId, productId } = device.deviceSettings;
       const foundPref = '################## Found Device';
@@ -95,6 +107,12 @@ const runCommandInQueue = (aRelaysModuleObject, aCommandToRun) => {
 
 const openDevice = (aRelaysModuleObject, aIsFirstTry = true) => {
   const retPromise = new Promise((resolve, reject) => {
+    if (!ftdi) {
+      const error = new Error('ft245rl module is not available. Please install FTDI drivers and rebuild the module.');
+      logger.relayAndSoundManager.error('FTDI module not available for opening device', { error });
+      reject(error);
+      return;
+    }
     ftdi.openDevice(aRelaysModuleObject.FtdiDevice).then(() => {
       resolve(true);
     }).catch((error) => {
@@ -132,6 +150,14 @@ const callBetweenOpenAndClose = (aRelaysModuleObject, aCallBackFunc) => {
           logger.relayAndSoundManager.error('Failed to activate action on device', { error: err });
         })
         .finally(() => {
+          if (!ftdi) {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(true);
+            }
+            return;
+          }
           ftdi.closeDevice(aRelaysModuleObject.FtdiDevice).then(() => {
             if (error) {
               reject(error);
@@ -167,6 +193,11 @@ const functionToRunCommands = (aRelaysModuleObject) => {
       }
       if ((tokensArray[1] !== 'find' && !aRelaysModuleObject.FtdiDevice)) {
         reject(new Error(`${errorPrefix}. FTDI device not set. Command : ${aPayload}`));
+        return;
+      }
+
+      if (!ftdi) {
+        reject(new Error(`${errorPrefix}. ft245rl module is not available. Please install FTDI drivers and rebuild the module. Command : ${aPayload}`));
         return;
       }
 
@@ -207,6 +238,11 @@ class RelaysModule {
     const errorPrefix = 'RelaysModule::constructor';
     this.FtdiDevice = null;
     this.runPromisesInQueue = new RunPromiseRoutineInQueue(functionToRunCommands(this));
+
+    if (!ftdi) {
+      logger.relayAndSoundManager.warn(`${errorPrefix} ft245rl module is not available. Relay functionality will be disabled. Please install FTDI drivers and rebuild the module if needed.`);
+      return;
+    }
 
     findDevice(this).then(() => {
       logger.relayAndSoundManager.info(`${errorPrefix} Managed to get handle to device`);
