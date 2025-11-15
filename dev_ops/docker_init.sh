@@ -50,6 +50,7 @@ if [ -n "${GONG_BE_BRANCH}" ]; then
 else
   git clone "${GONG_BE_REPO}" ~/Gong-be
 fi
+
 cp ~/Gong-be/dev_ops/deploy_gong.sh .
 cp ~/Gong-be/dev_ops/deploy_gong_actions.sh .
 rm -rf Gong-be
