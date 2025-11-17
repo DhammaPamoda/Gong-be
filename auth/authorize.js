@@ -4,19 +4,19 @@ const moment = require('moment');
 const utilsManager = require('../lib/utilsManager');
 const responder = require('../lib/responder');
 
-const secretCallback = (req, payload, done) => {
-  const { sub } = payload;
-  let foundSecret;
-  if (sub) {
-    const authUser = utilsManager.usersMap.get(sub.toLowerCase());
-    if (authUser) {
-      foundSecret = authUser.tokenSecret;
-      done(null, foundSecret);
+const secretCallback = (req, token) => {
+  return new Promise((resolve, reject) => {
+    const payload = token.payload;
+    const { sub } = payload;
+    if (sub) {
+      const authUser = utilsManager.usersMap.get(sub.toLowerCase());
+      if (authUser && authUser.tokenSecret) {
+        resolve(authUser.tokenSecret);
+        return;
+      }
     }
-  }
-  if (!foundSecret) {
-    done(new Error('missing_secret'));
-  }
+    reject(new Error('missing_secret'));
+  });
 };
 
 
@@ -37,6 +37,7 @@ function authorize(roles = []) {
     expressJwt({
       secret: secretCallback,
       algorithms: ['HS256'],
+      requestProperty: 'user', // Default is 'auth', but we use 'user' for backward compatibility
     })
       .unless({ path: ['/login', '/nextgong', '/api/login', '/api/nextgong', '/api/relay/isGongPlaying', '/api/relay/cancelGong', '/api/relay/playGong'] }),
 
