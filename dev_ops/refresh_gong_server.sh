@@ -3,6 +3,8 @@
 USER=$1
 USER_PASS=$2
 IS_DOCKER=$3
+GONG_BE_BRANCH=$4
+GONG_FE_BRANCH=$5
 
 mkdir -p "/home/${USER}/projects/gong_dev_ops/dev_ops_logs"
 
@@ -21,8 +23,8 @@ echo
 
 set -v
 /home/"${USER}"/projects/gong_dev_ops/dev_ops/server_stop.sh "${USER}" "${USER_PASS}" "${IS_DOCKER}" 2>&1 | tee -a "${new_log_file}"
-/home/"${USER}"/projects/gong_dev_ops/dev_ops/refresh_gong_server_be.sh "${USER}" "${USER_PASS}" 2>&1 | tee -a "${new_log_file}"
-/home/"${USER}"/projects/gong_dev_ops/dev_ops/refresh_gong_server_fe.sh "${USER}" 2>&1 | tee -a "${new_log_file}"
+/home/"${USER}"/projects/gong_dev_ops/dev_ops/refresh_gong_server_be.sh "${USER}" "${USER_PASS}" "${GONG_BE_BRANCH}" 2>&1 | tee -a "${new_log_file}"
+/home/"${USER}"/projects/gong_dev_ops/dev_ops/refresh_gong_server_fe.sh "${USER}" "${USER_PASS}" "${GONG_FE_BRANCH}" 2>&1 | tee -a "${new_log_file}"
 /home/"${USER}"/projects/gong_dev_ops/dev_ops/server_start.sh "${USER}" "${USER_PASS}" "${IS_DOCKER}" 2>&1 | tee -a "${new_log_file}"
 set +v
 

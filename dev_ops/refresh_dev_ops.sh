@@ -5,6 +5,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 set -x
 
+GONG_BE_BRANCH=$1
+
 mkdir -p /home/dhamma/projects/gong_dev_ops/dev_ops_logs
 new_log_file=/home/dhamma/projects/gong_dev_ops/dev_ops_logs/dev_ops_log_$(date +"%Y_%m_%d_%H_%M_%S")_dev.log
 
@@ -19,7 +21,7 @@ echo
 echo
 
 set -v
-/home/dhamma/projects/gong_dev_ops/dev_ops/refresh_dev_ops_actions.sh 2>&1 | tee -a "${new_log_file}"
+/home/dhamma/projects/gong_dev_ops/dev_ops/refresh_dev_ops_actions.sh "${GONG_BE_BRANCH}" 2>&1 | tee -a "${new_log_file}"
 
 set +v
 echo

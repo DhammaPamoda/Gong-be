@@ -64,8 +64,8 @@ cp -f "${DEV_OPS_FILES_DIR}/refresh_dev_ops.sh" "${GONG_DEV_OPS_DIR}/"
 cp -f "${DEV_OPS_FILES_DIR}/refresh_gong_server.sh" "${GONG_DEV_OPS_DIR}/"
 
 # Building the BE and FE
-"${DEV_OPS_FILES_DIR}"/refresh_gong_server_be.sh "${USER}"
-"${DEV_OPS_FILES_DIR}"/refresh_gong_server_fe.sh "${USER}"
+"${DEV_OPS_FILES_DIR}"/refresh_gong_server_be.sh "${USER}" "${USER_PASS}" "${GONG_BE_BRANCH}"
+"${DEV_OPS_FILES_DIR}"/refresh_gong_server_fe.sh "${USER}" "${USER_PASS}" "${GONG_FE_BRANCH}"
 
 # logrotate
 sudo -S cp -f "${DEV_OPS_FILES_DIR}/gong_logrotate" /etc/logrotate.d/gong <<< "${USER_PASS}"

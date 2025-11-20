@@ -11,6 +11,7 @@ echo
 set -v
 USER=$1
 USER_PASS=$2
+GONG_BE_BRANCH=$3
 
 cd "/home/${USER}/projects/Gong-be"
 rm -rf node_modules
@@ -19,13 +20,21 @@ set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 set -v
-sudo -S git fetch <<< "${USER_PASS}"
+if [ -n "${GONG_BE_BRANCH}" ]; then
+  sudo -S git fetch origin "${GONG_BE_BRANCH}" <<< "${USER_PASS}"
+else
+  sudo -S git fetch <<< "${USER_PASS}"
+fi
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 set -v
-sudo -S git pull <<< "${USER_PASS}"
+if [ -n "${GONG_BE_BRANCH}" ]; then
+  sudo -S git pull origin "${GONG_BE_BRANCH}" <<< "${USER_PASS}"
+else
+  sudo -S git pull <<< "${USER_PASS}"
+fi
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
