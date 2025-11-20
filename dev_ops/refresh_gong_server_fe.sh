@@ -46,6 +46,7 @@ set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 set -v
+echo "Node version: $(node -v)"
 sudo -S npm run build-to-prod <<< "${USER_PASS}"
 
 set +v
