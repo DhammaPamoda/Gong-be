@@ -10,7 +10,14 @@
  * compatibility issues exist.
  */
 
-const FTDI = require('ftdi-d2xx');
+let FTDI;
+try {
+  FTDI = require('ftdi-d2xx');
+} catch (error) {
+  // Package not available (likely GLIBC compatibility issue)
+  // Will be handled by the wrapper functions
+  FTDI = null;
+}
 const logger = require('../lib/logger');
 
 /**
@@ -111,6 +118,9 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<FtdiDeviceWrapper>}
    */
   async findFirst() {
+    if (!FTDI) {
+      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system (GLIBC compatibility issue).');
+    }
     try {
       const deviceList = await FTDI.getDeviceInfoList();
       
@@ -140,6 +150,9 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<void>}
    */
   async openDevice(deviceWrapper) {
+    if (!FTDI) {
+      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
+    }
     if (!deviceWrapper || !deviceWrapper.device) {
       throw new Error('Invalid device');
     }
@@ -154,6 +167,9 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<void>}
    */
   async closeDevice(deviceWrapper) {
+    if (!FTDI) {
+      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
+    }
     if (deviceWrapper) {
       await deviceWrapper.close();
     }
@@ -167,6 +183,9 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<void>}
    */
   async switchAllPorts(deviceWrapper, isOn) {
+    if (!FTDI) {
+      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
+    }
     if (!deviceWrapper || !deviceWrapper.device) {
       throw new Error('Invalid device');
     }
@@ -182,6 +201,9 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<void>}
    */
   async switchPorts(deviceWrapper, portArray) {
+    if (!FTDI) {
+      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
+    }
     if (!deviceWrapper || !deviceWrapper.device) {
       throw new Error('Invalid device');
     }

@@ -240,7 +240,7 @@ class RelaysModule {
     this.runPromisesInQueue = new RunPromiseRoutineInQueue(functionToRunCommands(this));
 
     if (!ftdi) {
-      logger.relayAndSoundManager.warn(`${errorPrefix} ft245rl module is not available. Relay functionality will be disabled. Please install FTDI drivers and rebuild the module if needed.`);
+      logger.relayAndSoundManager.warn(`${errorPrefix} FTDI module (ftdi-d2xx) is not available. Relay functionality will be disabled. Please rebuild ftdi-d2xx package for your system (see relay/FTDI_MIGRATION_NOTES.md for details).`);
       return;
     }
 
