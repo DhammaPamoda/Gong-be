@@ -1,7 +1,7 @@
 const { exec } = require('child_process');
 let ftdi;
 try {
-  ftdi = require('ft245rl');
+  ftdi = require('./ftdi-d2xx-wrapper');
 } catch (e) {
   ftdi = null;
 }
