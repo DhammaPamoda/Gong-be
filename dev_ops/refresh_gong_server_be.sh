@@ -84,6 +84,15 @@ npm i || {
   fi
 }
 
+if [ -f "./dev_ops/build_ftdi_d2xx_in_container.sh" ]; then
+  echo "Attempting to rebuild ftdi-d2xx (if required)..."
+  if ./dev_ops/build_ftdi_d2xx_in_container.sh; then
+    echo "ftdi-d2xx build step completed."
+  else
+    echo "Warning: ftdi-d2xx build step failed. Relay functionality may be unavailable."
+  fi
+fi
+
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
