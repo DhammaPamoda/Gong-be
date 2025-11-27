@@ -152,7 +152,15 @@ echo -e "-----------------------------------------------------------------------
 
 set -v
 export HISTIGNORE='*sudo -S*'
-sudo -S npm run build <<< "${USER_PASS}"
+
+# Detect npm path (needed for sudo which resets PATH)
+NPM_PATH=$(command -v npm || which npm 2>/dev/null || echo "npm")
+if [[ "$NPM_PATH" != "npm" ]] && [ -f "$NPM_PATH" ]; then
+  NPM_DIR=$(dirname "${NPM_PATH}")
+  sudo -S env "PATH=${NPM_DIR}:$PATH" "${NPM_PATH}" run build <<< "${USER_PASS}"
+else
+  sudo -S env "PATH=$PATH" npm run build <<< "${USER_PASS}"
+fi
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"

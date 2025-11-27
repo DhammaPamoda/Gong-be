@@ -39,6 +39,17 @@ validate_branch() {
 GONG_BE_REPO="https://github.com/DhammaPamoda/Gong-be.git"
 GONG_FE_REPO="https://github.com/DhammaPamoda/Gong_fe.git"
 
+# Clean up existing directories before cloning
+if [ -d "${BASE_DIR}/Gong-be" ]; then
+  echo "Removing existing Gong-be directory..."
+  rm -rf "${BASE_DIR}/Gong-be"
+fi
+
+if [ -d "${BASE_DIR}/Gong_fe" ]; then
+  echo "Removing existing Gong_fe directory..."
+  rm -rf "${BASE_DIR}/Gong_fe"
+fi
+
 if [ -n "${GONG_BE_BRANCH}" ]; then
   validate_branch "${GONG_BE_REPO}" "${GONG_BE_BRANCH}" || exit 1
   git clone -b "${GONG_BE_BRANCH}" "${GONG_BE_REPO}"
