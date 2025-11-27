@@ -117,10 +117,10 @@ Once deployment completes, the Gong server will be:
 
 ```bash
 # Start using the config file (recommended)
-pm2 start ~/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.json
+pm2 start ~/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.js
 
 # Or with sudo if needed
-sudo pm2 start ~/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.json
+sudo pm2 start ~/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.js
 ```
 
 ### Useful PM2 Commands

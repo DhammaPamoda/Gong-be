@@ -78,7 +78,6 @@ sudo -S cp -f "${DEV_OPS_FILES_DIR}/gong_logrotate" /etc/logrotate.d/gong <<< "$
 sudo -S sed -i "s/dhamma/${USER}/g" /etc/logrotate.d/gong <<< "${USER_PASS}"
 
 # pm2 shell to start the app
-sudo -S sed -i "s/dhamma/${USER}/g" "${DEV_OPS_FILES_DIR}/gong_server_pm2_config.json" <<< "${USER_PASS}"
 "${DEV_OPS_FILES_DIR}"/create_pm2_gong_server_process.sh "${USER}" "${USER_PASS}" "${IS_DOCKER}"
 
 # neutrelizing the old pathces scripts

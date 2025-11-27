@@ -2,7 +2,8 @@
   	"apps" : [
 		{
 	    	"name"        	: "gong_server",
-    		"script"      	: "/home/dhamma/projects/gong_server/server/index.js",
+    		"script"      	: "/home/p-admin/projects/gong_server/server/index.js",
+		"cwd"         	: "/home/p-admin/projects/gong_server",
 		"env": {
 			"NODE_ENV": "production",
 			"NO_OF_PORTS"   : "8"
