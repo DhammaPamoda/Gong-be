@@ -42,36 +42,12 @@ if [ "$EUID" -eq 0 ]; then
   fi
 fi
 
-# Detect OS
-if [ -f /etc/os-release ]; then
-  . /etc/os-release
-  OS=$ID
-  OS_VERSION=$VERSION_ID
-else
-  echo "Error: Cannot detect OS. This script supports Ubuntu/Debian."
-  exit 1
-fi
-
-echo "Detected OS: $OS $OS_VERSION"
-echo
-
-# Check for supported OS
-if [[ "$OS" != "ubuntu" && "$OS" != "debian" ]]; then
-  echo "Warning: This script is tested on Ubuntu/Debian."
-  echo "Other distributions may require manual adjustments."
-  read -p "Continue anyway? (y/N): " confirm
-  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-    exit 1
-  fi
-fi
-
-echo "This script will install:"
-echo "  - Git"
-echo "  - Node.js 18.x"
-echo "  - npm"
+echo "This script will install (if not already present):"
+echo "  - Git, curl, wget"
+echo "  - Node.js 18.x & npm"
 echo "  - Docker"
 echo "  - PM2"
-echo "  - Build tools (for native modules)"
+echo "  - Build tools (gcc, cmake, g++, make, python3)"
 echo
 echo "And download deployment scripts to ~/:"
 echo "  - docker_init.sh"
@@ -89,12 +65,38 @@ echo ">>> Updating package lists..."
 sudo apt update
 
 echo
-echo ">>> Installing essential tools..."
-sudo apt install -y git curl wget ca-certificates gnupg lsb-release
+echo ">>> Installing essential tools (if needed)..."
+ESSENTIAL_TOOLS=""
+command -v git &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS git"
+command -v curl &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS curl"
+command -v wget &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS wget"
+command -v gpg &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS gnupg"
+command -v lsb_release &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS lsb-release"
+# ca-certificates is always needed for HTTPS
+ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS ca-certificates"
+
+if [ -n "$ESSENTIAL_TOOLS" ]; then
+  echo "Installing:$ESSENTIAL_TOOLS"
+  sudo apt install -y $ESSENTIAL_TOOLS
+else
+  echo "All essential tools already installed."
+fi
 
 echo
-echo ">>> Installing build tools (for native modules)..."
-sudo apt install -y build-essential cmake g++ make python3
+echo ">>> Installing build tools (for native modules, if needed)..."
+BUILD_TOOLS=""
+command -v gcc &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS build-essential"
+command -v cmake &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS cmake"
+command -v g++ &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS g++"
+command -v make &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS make"
+command -v python3 &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS python3"
+
+if [ -n "$BUILD_TOOLS" ]; then
+  echo "Installing:$BUILD_TOOLS"
+  sudo apt install -y $BUILD_TOOLS
+else
+  echo "All build tools already installed."
+fi
 
 echo
 echo ">>> Installing Node.js 18.x..."
@@ -172,7 +174,6 @@ echo "Bootstrap Complete!"
 echo "=========================================="
 echo
 echo "System Requirements Met:"
-echo "  OS:     $OS $OS_VERSION"
 echo "  Git:    $(git --version | cut -d' ' -f3)"
 echo "  Node:   $(node --version)"
 echo "  npm:    $(npm --version)"
