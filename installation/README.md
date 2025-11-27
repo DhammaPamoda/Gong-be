@@ -16,7 +16,7 @@ chmod +x bootstrap_clean_machine.sh
 ```bash
 curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/<BRANCH>/installation/bootstrap_clean_machine.sh
 chmod +x bootstrap_clean_machine.sh
-./bootstrap_clean_machine.sh <BRANCH>
+./bootstrap_clean_machine.sh <GONG_BE_BRANCH>
 ./docker_init.sh <USER> <USER_PASS> <IS_DOCKER> <GONG_BE_BRANCH> <GONG_FE_BRANCH>
 ```
 
