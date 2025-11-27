@@ -14,11 +14,6 @@ DEV_OPS_FILES_DIR="${GONG_DEV_OPS_DIR}/dev_ops"
 
 set -v
 
-# Essential dirs
-mkdir -p "${BASE_DIR}"
-mkdir -p "${GONG_DEV_OPS_DIR}"
-mkdir -p "${GONG_DEV_OPS_DIR}/dev_ops_logs"
-mkdir -p "${BASE_DIR}/gong_server"
 cd "${BASE_DIR}/"
 
 export HISTIGNORE='*sudo -S*'
