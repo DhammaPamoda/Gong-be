@@ -85,7 +85,7 @@ sudo -S sed -i "s/dhamma/${USER}/g" "${DEV_OPS_FILES_DIR}/gong_server_pm2_config
 PATCHES_INSTALLED_DIR="${DEV_OPS_FILES_DIR}/patches_installed"
 mkdir -p "${PATCHES_INSTALLED_DIR}"
 for path in $(find "${DEV_OPS_FILES_DIR}"/patches/*.sh ); do
-  path_installed="${PATCHES_INSTALLED_DIR}/patches_installed/${path##*/}"
+  path_installed="${PATCHES_INSTALLED_DIR}/${path##*/}"
   touch "${path_installed}"
   echo neutrelizing patch "${path##*/}"
 done
