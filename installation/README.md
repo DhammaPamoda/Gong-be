@@ -113,7 +113,17 @@ Once deployment completes, the Gong server will be:
 - Auto-starting on system reboot
 - Located at `/home/<USER>/projects/`
 
-### Useful Commands
+### Running Gong Server with PM2
+
+```bash
+# Start using the config file (recommended)
+pm2 start ~/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.json
+
+# Or with sudo if needed
+sudo pm2 start ~/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.json
+```
+
+### Useful PM2 Commands
 
 ```bash
 # Check PM2 status
@@ -125,10 +135,41 @@ pm2 logs gong_server
 # Restart server
 pm2 restart gong_server
 
-# Setup PM2 to start on boot (run once)
-pm2 startup
+# Stop server
+pm2 stop gong_server
+
+# Save current process list
 pm2 save
 ```
+
+### Enable PM2 Auto-Start on Reboot (One-Time Setup)
+
+To ensure the Gong server automatically starts after a system reboot:
+
+```bash
+# Step 1: Generate the startup script command
+pm2 startup
+```
+
+PM2 will output a command like this (with `sudo`):
+```bash
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u p-admin --hp /home/p-admin
+```
+
+**Important:** Copy and run the exact command that PM2 outputs (it's customized to your system).
+
+```bash
+# Step 2: Save the current process list
+pm2 save
+```
+
+| Command | Purpose |
+|---------|---------|
+| `pm2 startup` | Generates a system service command for auto-start |
+| *(run the generated sudo command)* | Installs the systemd service |
+| `pm2 save` | Saves current processes to be restored on boot |
+
+After this setup, your `gong_server` will automatically start after every system restart.
 
 ## Build Cache
 
