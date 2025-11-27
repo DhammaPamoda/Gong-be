@@ -5,7 +5,7 @@ set -e
 # ==========================================
 # System Requirements for Gong Server:
 # ==========================================
-# OS:      Ubuntu 20.04+ / Debian 11+
+# OS:      Linux (Debian/Ubuntu, Fedora/RHEL/CentOS, Arch)
 # Node.js: 18.x
 # npm:     9.x+
 # Docker:  20.x+ (for FTDI relay module build)
@@ -24,12 +24,139 @@ set -e
 GONG_BE_BRANCH="${1:-main}"
 REPO_BASE_URL="https://raw.githubusercontent.com/DhammaPamoda/Gong-be/${GONG_BE_BRANCH}"
 
+# ==========================================
+# Package Manager Detection
+# ==========================================
+detect_package_manager() {
+  if command -v apt &> /dev/null; then
+    PKG_MANAGER="apt"
+    PKG_UPDATE="sudo apt update"
+    PKG_INSTALL="sudo apt install -y"
+    # Package name mappings for apt
+    PKG_GIT="git"
+    PKG_CURL="curl"
+    PKG_WGET="wget"
+    PKG_GPG="gnupg"
+    PKG_CA_CERTS="ca-certificates"
+    PKG_BUILD_ESSENTIAL="build-essential"
+    PKG_CMAKE="cmake"
+    PKG_GPP="g++"
+    PKG_MAKE="make"
+    PKG_PYTHON3="python3"
+    PKG_NODEJS="nodejs"
+  elif command -v dnf &> /dev/null; then
+    PKG_MANAGER="dnf"
+    PKG_UPDATE="sudo dnf check-update || true"
+    PKG_INSTALL="sudo dnf install -y"
+    # Package name mappings for dnf
+    PKG_GIT="git"
+    PKG_CURL="curl"
+    PKG_WGET="wget"
+    PKG_GPG="gnupg2"
+    PKG_CA_CERTS="ca-certificates"
+    PKG_BUILD_ESSENTIAL="gcc gcc-c++ kernel-devel"
+    PKG_CMAKE="cmake"
+    PKG_GPP="gcc-c++"
+    PKG_MAKE="make"
+    PKG_PYTHON3="python3"
+    PKG_NODEJS="nodejs"
+  elif command -v yum &> /dev/null; then
+    PKG_MANAGER="yum"
+    PKG_UPDATE="sudo yum check-update || true"
+    PKG_INSTALL="sudo yum install -y"
+    # Package name mappings for yum
+    PKG_GIT="git"
+    PKG_CURL="curl"
+    PKG_WGET="wget"
+    PKG_GPG="gnupg2"
+    PKG_CA_CERTS="ca-certificates"
+    PKG_BUILD_ESSENTIAL="gcc gcc-c++ kernel-devel"
+    PKG_CMAKE="cmake"
+    PKG_GPP="gcc-c++"
+    PKG_MAKE="make"
+    PKG_PYTHON3="python3"
+    PKG_NODEJS="nodejs"
+  elif command -v pacman &> /dev/null; then
+    PKG_MANAGER="pacman"
+    PKG_UPDATE="sudo pacman -Sy"
+    PKG_INSTALL="sudo pacman -S --noconfirm"
+    # Package name mappings for pacman
+    PKG_GIT="git"
+    PKG_CURL="curl"
+    PKG_WGET="wget"
+    PKG_GPG="gnupg"
+    PKG_CA_CERTS="ca-certificates"
+    PKG_BUILD_ESSENTIAL="base-devel"
+    PKG_CMAKE="cmake"
+    PKG_GPP="gcc"
+    PKG_MAKE="make"
+    PKG_PYTHON3="python"
+    PKG_NODEJS="nodejs"
+  else
+    echo "Error: No supported package manager found (apt, dnf, yum, pacman)."
+    exit 1
+  fi
+  echo "Detected package manager: $PKG_MANAGER"
+}
+
+# Install Node.js 18.x based on distro
+install_nodejs() {
+  if command -v node &> /dev/null; then
+    NODE_VERSION=$(node --version)
+    echo "Node.js already installed: $NODE_VERSION"
+    if [[ ! "$NODE_VERSION" =~ ^v18\. ]]; then
+      echo "Warning: Node.js version is not 18.x. Installing 18.x..."
+    else
+      return 0
+    fi
+  fi
+
+  echo "Installing Node.js 18.x..."
+  case "$PKG_MANAGER" in
+    apt)
+      curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+      $PKG_INSTALL $PKG_NODEJS
+      ;;
+    dnf|yum)
+      curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+      $PKG_INSTALL $PKG_NODEJS
+      ;;
+    pacman)
+      # Arch typically has recent Node.js in repos, or use nvm
+      $PKG_INSTALL nodejs npm
+      ;;
+  esac
+}
+
+# Remove old Docker versions based on distro
+remove_old_docker() {
+  case "$PKG_MANAGER" in
+    apt)
+      sudo apt remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
+      ;;
+    dnf|yum)
+      sudo $PKG_MANAGER remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine 2>/dev/null || true
+      ;;
+    pacman)
+      sudo pacman -R --noconfirm docker 2>/dev/null || true
+      ;;
+  esac
+}
+
+# ==========================================
+# Main Script
+# ==========================================
+
 echo "=========================================="
 echo "Gong Server - Clean Machine Bootstrap"
 echo "=========================================="
 if [ "$GONG_BE_BRANCH" != "main" ]; then
   echo "Using branch: $GONG_BE_BRANCH"
 fi
+echo
+
+# Detect package manager first
+detect_package_manager
 echo
 
 # Check if running as root (not recommended)
@@ -62,22 +189,21 @@ fi
 
 echo
 echo ">>> Updating package lists..."
-sudo apt update
+$PKG_UPDATE
 
 echo
 echo ">>> Installing essential tools (if needed)..."
 ESSENTIAL_TOOLS=""
-command -v git &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS git"
-command -v curl &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS curl"
-command -v wget &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS wget"
-command -v gpg &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS gnupg"
-command -v lsb_release &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS lsb-release"
+command -v git &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS $PKG_GIT"
+command -v curl &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS $PKG_CURL"
+command -v wget &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS $PKG_WGET"
+command -v gpg &> /dev/null || ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS $PKG_GPG"
 # ca-certificates is always needed for HTTPS
-ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS ca-certificates"
+ESSENTIAL_TOOLS="$ESSENTIAL_TOOLS $PKG_CA_CERTS"
 
-if [ -n "$ESSENTIAL_TOOLS" ]; then
+if [ -n "$(echo $ESSENTIAL_TOOLS | tr -d ' ')" ]; then
   echo "Installing:$ESSENTIAL_TOOLS"
-  sudo apt install -y $ESSENTIAL_TOOLS
+  $PKG_INSTALL $ESSENTIAL_TOOLS
 else
   echo "All essential tools already installed."
 fi
@@ -85,33 +211,22 @@ fi
 echo
 echo ">>> Installing build tools (for native modules, if needed)..."
 BUILD_TOOLS=""
-command -v gcc &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS build-essential"
-command -v cmake &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS cmake"
-command -v g++ &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS g++"
-command -v make &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS make"
-command -v python3 &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS python3"
+command -v gcc &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS $PKG_BUILD_ESSENTIAL"
+command -v cmake &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS $PKG_CMAKE"
+command -v g++ &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS $PKG_GPP"
+command -v make &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS $PKG_MAKE"
+command -v python3 &> /dev/null || BUILD_TOOLS="$BUILD_TOOLS $PKG_PYTHON3"
 
-if [ -n "$BUILD_TOOLS" ]; then
+if [ -n "$(echo $BUILD_TOOLS | tr -d ' ')" ]; then
   echo "Installing:$BUILD_TOOLS"
-  sudo apt install -y $BUILD_TOOLS
+  $PKG_INSTALL $BUILD_TOOLS
 else
   echo "All build tools already installed."
 fi
 
 echo
 echo ">>> Installing Node.js 18.x..."
-if command -v node &> /dev/null; then
-  NODE_VERSION=$(node --version)
-  echo "Node.js already installed: $NODE_VERSION"
-  if [[ ! "$NODE_VERSION" =~ ^v18\. ]]; then
-    echo "Warning: Node.js version is not 18.x. Upgrading..."
-    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt install -y nodejs
-  fi
-else
-  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-  sudo apt install -y nodejs
-fi
+install_nodejs
 
 echo
 echo ">>> Verifying Node.js installation..."
@@ -124,9 +239,9 @@ if command -v docker &> /dev/null; then
   echo "Docker already installed: $(docker --version)"
 else
   # Remove old versions if any
-  sudo apt remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
+  remove_old_docker
   
-  # Install Docker using official script
+  # Install Docker using official script (works on most distros)
   curl -fsSL https://get.docker.com | sudo sh
   
   echo "Docker installed: $(docker --version)"
@@ -204,4 +319,3 @@ else
   echo "  ./docker_init.sh <USER> <USER_PASS> <IS_DOCKER>${BRANCH_HINT}"
 fi
 echo
-
