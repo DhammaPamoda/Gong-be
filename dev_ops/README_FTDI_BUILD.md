@@ -10,13 +10,44 @@ This process builds the `ftdi-d2xx` native module binary in a Docker container w
 - User has permission to run Docker commands
 - `ftdi-d2xx` package installed in `node_modules` (will be installed automatically if missing)
 
+### Clean Machine Setup
+
+For a fresh Ubuntu/Debian machine, run the bootstrap script first:
+
+```bash
+curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/main/installation/bootstrap_clean_machine.sh
+chmod +x bootstrap_clean_machine.sh
+./bootstrap_clean_machine.sh
+```
+
+This installs: Git, Node.js 18.x, Docker, PM2, and build tools.
+
+See `/installation/README.md` for full installation documentation.
+
 ## Usage
+
+### Manual Build
 
 From the `dev_ops` directory, run:
 
 ```bash
 ./build_ftdi_d2xx.sh
 ```
+
+### Automatic Build (via docker_init.sh)
+
+The FTDI build is automatically triggered during the `docker_init.sh` deployment process:
+
+```
+docker_init.sh
+  └── deploy_gong.sh
+        └── deploy_gong_actions.sh
+              └── refresh_gong_server_be.sh  ← FTDI build happens here
+```
+
+The script automatically detects the environment:
+- **On host machine**: Uses `build_ftdi_d2xx.sh` (Docker-based build with GLIBC 2.31)
+- **Inside container**: Uses `build_ftdi_d2xx_in_container.sh` (native build)
 
 ## What the Script Does
 

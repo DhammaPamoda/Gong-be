@@ -1,0 +1,206 @@
+#!/bin/bash
+
+set -e
+
+# ==========================================
+# System Requirements for Gong Server:
+# ==========================================
+# OS:      Ubuntu 20.04+ / Debian 11+
+# Node.js: 18.x
+# npm:     9.x+
+# Docker:  20.x+ (for FTDI relay module build)
+# PM2:     5.x+ (process manager)
+# ==========================================
+#
+# Usage: ./bootstrap_clean_machine.sh [GONG_BE_BRANCH]
+#   GONG_BE_BRANCH: Optional. Branch to download scripts from (default: main)
+#
+# Examples:
+#   ./bootstrap_clean_machine.sh              # Uses main branch
+#   ./bootstrap_clean_machine.sh develop      # Uses develop branch
+#   ./bootstrap_clean_machine.sh feature/xyz  # Uses feature/xyz branch
+# ==========================================
+
+GONG_BE_BRANCH="${1:-main}"
+REPO_BASE_URL="https://raw.githubusercontent.com/DhammaPamoda/Gong-be/${GONG_BE_BRANCH}"
+
+echo "=========================================="
+echo "Gong Server - Clean Machine Bootstrap"
+echo "=========================================="
+if [ "$GONG_BE_BRANCH" != "main" ]; then
+  echo "Using branch: $GONG_BE_BRANCH"
+fi
+echo
+
+# Check if running as root (not recommended)
+if [ "$EUID" -eq 0 ]; then
+  echo "Warning: Running as root is not recommended."
+  echo "Please run as a regular user with sudo privileges."
+  read -p "Continue anyway? (y/N): " confirm
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
+fi
+
+# Detect OS
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  OS=$ID
+  OS_VERSION=$VERSION_ID
+else
+  echo "Error: Cannot detect OS. This script supports Ubuntu/Debian."
+  exit 1
+fi
+
+echo "Detected OS: $OS $OS_VERSION"
+echo
+
+# Check for supported OS
+if [[ "$OS" != "ubuntu" && "$OS" != "debian" ]]; then
+  echo "Warning: This script is tested on Ubuntu/Debian."
+  echo "Other distributions may require manual adjustments."
+  read -p "Continue anyway? (y/N): " confirm
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    exit 1
+  fi
+fi
+
+echo "This script will install:"
+echo "  - Git"
+echo "  - Node.js 18.x"
+echo "  - npm"
+echo "  - Docker"
+echo "  - PM2"
+echo "  - Build tools (for native modules)"
+echo
+echo "And download deployment scripts to ~/:"
+echo "  - docker_init.sh"
+echo "  - deploy_gong.sh"
+echo "  - deploy_gong_actions.sh"
+echo
+read -p "Proceed with installation? (y/N): " confirm
+if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+  echo "Aborted."
+  exit 0
+fi
+
+echo
+echo ">>> Updating package lists..."
+sudo apt update
+
+echo
+echo ">>> Installing essential tools..."
+sudo apt install -y git curl wget ca-certificates gnupg lsb-release
+
+echo
+echo ">>> Installing build tools (for native modules)..."
+sudo apt install -y build-essential cmake g++ make python3
+
+echo
+echo ">>> Installing Node.js 18.x..."
+if command -v node &> /dev/null; then
+  NODE_VERSION=$(node --version)
+  echo "Node.js already installed: $NODE_VERSION"
+  if [[ ! "$NODE_VERSION" =~ ^v18\. ]]; then
+    echo "Warning: Node.js version is not 18.x. Upgrading..."
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    sudo apt install -y nodejs
+  fi
+else
+  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  sudo apt install -y nodejs
+fi
+
+echo
+echo ">>> Verifying Node.js installation..."
+node --version
+npm --version
+
+echo
+echo ">>> Installing Docker..."
+if command -v docker &> /dev/null; then
+  echo "Docker already installed: $(docker --version)"
+else
+  # Remove old versions if any
+  sudo apt remove -y docker docker-engine docker.io containerd runc 2>/dev/null || true
+  
+  # Install Docker using official script
+  curl -fsSL https://get.docker.com | sudo sh
+  
+  echo "Docker installed: $(docker --version)"
+fi
+
+echo
+echo ">>> Adding user to docker group..."
+if groups $USER | grep -q '\bdocker\b'; then
+  echo "User already in docker group."
+else
+  sudo usermod -aG docker $USER
+  echo "User added to docker group."
+  echo "NOTE: You need to log out and log back in for this to take effect."
+  NEED_RELOGIN=true
+fi
+
+echo
+echo ">>> Starting Docker service..."
+sudo systemctl enable docker
+sudo systemctl start docker
+
+echo
+echo ">>> Installing PM2 globally..."
+if command -v pm2 &> /dev/null; then
+  echo "PM2 already installed: $(pm2 --version)"
+else
+  sudo npm install -g pm2
+  echo "PM2 installed: $(pm2 --version)"
+fi
+
+echo
+echo ">>> Downloading deployment scripts to home directory..."
+echo "    (from branch: ${GONG_BE_BRANCH})"
+cd ~
+curl -fsSL -O "${REPO_BASE_URL}/dev_ops/docker_init.sh"
+curl -fsSL -O "${REPO_BASE_URL}/dev_ops/deploy_gong.sh"
+curl -fsSL -O "${REPO_BASE_URL}/dev_ops/deploy_gong_actions.sh"
+chmod +x docker_init.sh deploy_gong.sh deploy_gong_actions.sh
+echo "Deployment scripts downloaded to: $(pwd)"
+ls -la docker_init.sh deploy_gong.sh deploy_gong_actions.sh
+
+echo
+echo "=========================================="
+echo "Bootstrap Complete!"
+echo "=========================================="
+echo
+echo "System Requirements Met:"
+echo "  OS:     $OS $OS_VERSION"
+echo "  Git:    $(git --version | cut -d' ' -f3)"
+echo "  Node:   $(node --version)"
+echo "  npm:    $(npm --version)"
+echo "  Docker: $(docker --version | cut -d' ' -f3 | tr -d ',')"
+echo "  PM2:    $(pm2 --version)"
+echo
+echo "Deployment scripts in ~/:"
+echo "  - docker_init.sh"
+echo "  - deploy_gong.sh"
+echo "  - deploy_gong_actions.sh"
+echo
+
+BRANCH_HINT=""
+if [ "$GONG_BE_BRANCH" != "main" ]; then
+  BRANCH_HINT=" ${GONG_BE_BRANCH}"
+fi
+
+if [ "$NEED_RELOGIN" = true ]; then
+  echo "⚠️  IMPORTANT: You were added to the docker group."
+  echo "   Please LOG OUT and LOG BACK IN, then run docker_init.sh"
+  echo
+  echo "After re-login, run:"
+  echo "  cd ~"
+  echo "  ./docker_init.sh <USER> <USER_PASS> <IS_DOCKER>${BRANCH_HINT}"
+else
+  echo "You can now run docker_init.sh:"
+  echo "  cd ~"
+  echo "  ./docker_init.sh <USER> <USER_PASS> <IS_DOCKER>${BRANCH_HINT}"
+fi
+echo
+

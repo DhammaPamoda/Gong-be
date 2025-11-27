@@ -116,12 +116,34 @@ npm i || {
   fi
 }
 
-if [ -f "./dev_ops/build_ftdi_d2xx_in_container.sh" ]; then
-  echo "Attempting to rebuild ftdi-d2xx (if required)..."
-  if ./dev_ops/build_ftdi_d2xx_in_container.sh; then
-    echo "ftdi-d2xx build step completed."
-  else
-    echo "Warning: ftdi-d2xx build step failed. Relay functionality may be unavailable."
+# Build ftdi-d2xx native module if needed
+# Two approaches depending on environment:
+# 1. Inside container: build natively using build_ftdi_d2xx_in_container.sh
+# 2. On host with Docker: use Docker to build with correct GLIBC via build_ftdi_d2xx.sh
+
+if [ -f "/.dockerenv" ] || grep -qa 'docker\|containerd' /proc/1/cgroup 2>/dev/null; then
+  # Running inside a container - use native build
+  if [ -f "./dev_ops/build_ftdi_d2xx_in_container.sh" ]; then
+    echo "Attempting to rebuild ftdi-d2xx (in-container build)..."
+    if ./dev_ops/build_ftdi_d2xx_in_container.sh; then
+      echo "ftdi-d2xx in-container build step completed."
+    else
+      echo "Warning: ftdi-d2xx in-container build step failed. Relay functionality may be unavailable."
+    fi
+  fi
+else
+  # Running on host - use Docker-based build if Docker is available
+  if [ -f "./dev_ops/build_ftdi_d2xx.sh" ]; then
+    echo "Attempting to rebuild ftdi-d2xx (Docker-based build)..."
+    if docker info >/dev/null 2>&1 || sudo docker info >/dev/null 2>&1; then
+      if ./dev_ops/build_ftdi_d2xx.sh; then
+        echo "ftdi-d2xx Docker build step completed."
+      else
+        echo "Warning: ftdi-d2xx Docker build step failed. Relay functionality may be unavailable."
+      fi
+    else
+      echo "Warning: Docker not available. Skipping ftdi-d2xx Docker build."
+    fi
   fi
 fi
 
