@@ -6,6 +6,31 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GONG_BE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 DOCKER_IMAGE="ftdi-d2xx-builder"
 CONTAINER_NAME="ftdi-d2xx-build-$(date +%s)"
+CACHE_DIR="${HOME}/.cache/ftdi-d2xx"
+CACHED_BINARY="${CACHE_DIR}/ftdi-d2xx.Linux.x86_64.node"
+TARGET_DIR="${GONG_BE_DIR}/node_modules/ftdi-d2xx/build/Release"
+TARGET_BINARY="${TARGET_DIR}/ftdi-d2xx.Linux.x86_64.node"
+
+# Check if cached binary exists
+if [ -f "${CACHED_BINARY}" ]; then
+    echo "=========================================="
+    echo "Using cached ftdi-d2xx binary"
+    echo "=========================================="
+    
+    # Ensure target directory exists
+    mkdir -p "${TARGET_DIR}"
+    
+    # Copy from cache
+    cp "${CACHED_BINARY}" "${TARGET_BINARY}"
+    chmod 755 "${TARGET_BINARY}"
+    
+    echo "Copied from: ${CACHED_BINARY}"
+    echo "Binary location: ${TARGET_BINARY}"
+    echo "=========================================="
+    exit 0
+fi
+
+echo "No cached binary found, building..."
 
 # Detect if we need to use sudo for docker commands
 DOCKER_CMD="docker"
@@ -42,7 +67,7 @@ if [ ! -d "node_modules/ftdi-d2xx" ]; then
 fi
 
 # Create build directory if it doesn't exist
-mkdir -p node_modules/ftdi-d2xx/build/Release
+mkdir -p "${TARGET_DIR}"
 
 # Run container to build the binary
 echo "Building ftdi-d2xx binary in container..."
@@ -59,13 +84,19 @@ ${DOCKER_CMD} run --name ${CONTAINER_NAME} \
 # Copy binary from container
 echo "Copying binary from container..."
 ${DOCKER_CMD} cp ${CONTAINER_NAME}:/build/ftdi-d2xx/build/Release/ftdi-d2xx.Linux.x86_64.node \
-    "${GONG_BE_DIR}/node_modules/ftdi-d2xx/build/Release/ftdi-d2xx.Linux.x86_64.node"
+    "${TARGET_BINARY}"
 
 # Clean up container
 echo "Cleaning up container..."
 ${DOCKER_CMD} rm ${CONTAINER_NAME}
 
+# Cache the built binary
+echo "Caching binary for future use..."
+mkdir -p "${CACHE_DIR}"
+cp "${TARGET_BINARY}" "${CACHED_BINARY}"
+
 echo "=========================================="
 echo "Build complete!"
-echo "Binary location: ${GONG_BE_DIR}/node_modules/ftdi-d2xx/build/Release/ftdi-d2xx.Linux.x86_64.node"
+echo "Binary location: ${TARGET_BINARY}"
+echo "Cached at: ${CACHED_BINARY}"
 echo "=========================================="
