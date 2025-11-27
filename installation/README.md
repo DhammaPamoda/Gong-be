@@ -14,10 +14,10 @@ chmod +x bootstrap_clean_machine.sh
 
 **With specific branch:**
 ```bash
-curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/<GONG_BE_BRANCH>/installation/bootstrap_clean_machine.sh
+curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/try-to-fix-time-change/installation/bootstrap_clean_machine.sh
 chmod +x bootstrap_clean_machine.sh
-./bootstrap_clean_machine.sh <GONG_BE_BRANCH>
-./docker_init.sh <USER> <USER_PASS> <IS_DOCKER> <GONG_BE_BRANCH> <GONG_FE_BRANCH>
+./bootstrap_clean_machine.sh try-to-fix-time-change
+./docker_init.sh <USER> <USER_PASS> <IS_DOCKER> try-to-fix-time-change <GONG_FE_BRANCH>
 ```
 
 ---
@@ -26,11 +26,13 @@ chmod +x bootstrap_clean_machine.sh
 
 | Component | Version |
 |-----------|---------|
-| OS | Ubuntu 20.04+ / Debian 11+ |
+| OS | Linux (Debian/Ubuntu, Fedora/RHEL/CentOS, Arch) |
 | Node.js | 18.x |
 | npm | 9.x+ |
 | Docker | 20.x+ (for FTDI relay module build) |
 | PM2 | 5.x+ (process manager) |
+
+**Supported Package Managers:** apt, dnf, yum, pacman
 
 ## Quick Start
 
@@ -65,7 +67,7 @@ cd ~
 
 ## What the Bootstrap Script Does
 
-The `bootstrap_clean_machine.sh` script automates the setup of a fresh Ubuntu/Debian machine:
+The `bootstrap_clean_machine.sh` script automates the setup of a fresh Linux machine:
 
 ### 1. Installs System Dependencies
 - **Git** - Version control
@@ -127,6 +129,43 @@ pm2 restart gong_server
 pm2 startup
 pm2 save
 ```
+
+## Build Cache
+
+The deployment scripts use caching to skip unnecessary rebuilds when the code hasn't changed.
+
+### Cache Locations
+
+| Cache File | Purpose |
+|------------|---------|
+| `~/.cache/gong/fe_last_build_commit` | Stores the last built frontend commit hash |
+| `~/.cache/ftdi-d2xx/ftdi-d2xx.Linux.x86_64.node` | Cached FTDI binary (avoids Docker rebuild) |
+
+### How it Works
+
+- Before building the frontend, the script compares the current git commit with the cached commit
+- If they match, the build is skipped (saving time)
+- If they differ, a full build is performed and the cache is updated
+
+### Force Rebuild
+
+To force a full rebuild even when there are no changes:
+
+```bash
+# Clear frontend build cache
+rm ~/.cache/gong/fe_last_build_commit
+
+# Clear FTDI binary cache (forces Docker rebuild)
+rm ~/.cache/ftdi-d2xx/ftdi-d2xx.Linux.x86_64.node
+
+# Clear all Gong caches
+rm -rf ~/.cache/gong ~/.cache/ftdi-d2xx
+
+# Then run deployment as normal
+./docker_init.sh <USER> <USER_PASS> <IS_DOCKER>
+```
+
+---
 
 ## Troubleshooting
 

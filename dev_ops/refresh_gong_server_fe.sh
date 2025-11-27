@@ -13,6 +13,13 @@ USER=$1
 USER_PASS=$2
 GONG_FE_BRANCH=$3
 
+# ==========================================
+# Cache Configuration
+# ==========================================
+CACHE_DIR="/home/${USER}/.cache/gong"
+FE_CACHE_FILE="${CACHE_DIR}/fe_last_build_commit"
+mkdir -p "${CACHE_DIR}"
+
 # Detect npm and node paths (needed for sudo commands which reset PATH)
 NPM_PATH=$(command -v npm || which npm || find ~/.nvm -name npm 2>/dev/null | head -1 || echo "npm")
 NODE_PATH=$(command -v node || which node || find ~/.nvm -name node 2>/dev/null | head -1 || echo "node")
@@ -26,7 +33,6 @@ if [[ "$NPM_PATH" == "npm" ]] && [ -s "$HOME/.nvm/nvm.sh" ]; then
 fi
 
 cd "/home/${USER}/projects/Gong_fe"
-rm -rf node_modules
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
@@ -51,24 +57,48 @@ fi
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
-set -v
-npm i
+# ==========================================
+# Cache Check: Skip build if no changes
+# ==========================================
+CURRENT_COMMIT=$(git rev-parse HEAD)
+CACHED_COMMIT=""
+if [ -f "${FE_CACHE_FILE}" ]; then
+  CACHED_COMMIT=$(cat "${FE_CACHE_FILE}")
+fi
 
-set +v
-echo -e "----------------------------------------------------------------------------------------------------"
+echo "Current FE commit: ${CURRENT_COMMIT}"
+echo "Cached FE commit:  ${CACHED_COMMIT:-none}"
 
-set -v
-echo "Node version: $(${NODE_PATH} -v)"
-# Use full path to npm with sudo (sudo resets PATH, so we need absolute path)
-# Ensure node bin directory is in PATH for npm to find node
-if [[ "$NPM_PATH" != "npm" ]] && [ -f "$NPM_PATH" ]; then
-  # Extract directory containing npm and ensure it's in PATH
-  NPM_DIR=$(dirname "${NPM_PATH}")
-  # Use absolute path to npm and ensure node is in PATH
-  sudo -S env "PATH=${NPM_DIR}:$PATH" "${NPM_PATH}" run build-to-prod <<< "${USER_PASS}"
+if [ "${CURRENT_COMMIT}" = "${CACHED_COMMIT}" ]; then
+  echo ">>> Frontend unchanged since last build. Skipping build-to-prod..."
+  echo ">>> To force rebuild, delete: ${FE_CACHE_FILE}"
 else
-  # Fallback: preserve PATH and hope npm is in system PATH
-  sudo -S env "PATH=$PATH" npm run build-to-prod <<< "${USER_PASS}"
+  echo ">>> Frontend has changes. Running full build..."
+  
+  set -v
+  rm -rf node_modules
+  npm i
+
+  set +v
+  echo -e "----------------------------------------------------------------------------------------------------"
+
+  set -v
+  echo "Node version: $(${NODE_PATH} -v)"
+  # Use full path to npm with sudo (sudo resets PATH, so we need absolute path)
+  # Ensure node bin directory is in PATH for npm to find node
+  if [[ "$NPM_PATH" != "npm" ]] && [ -f "$NPM_PATH" ]; then
+    # Extract directory containing npm and ensure it's in PATH
+    NPM_DIR=$(dirname "${NPM_PATH}")
+    # Use absolute path to npm and ensure node is in PATH
+    sudo -S env "PATH=${NPM_DIR}:$PATH" "${NPM_PATH}" run build-to-prod <<< "${USER_PASS}"
+  else
+    # Fallback: preserve PATH and hope npm is in system PATH
+    sudo -S env "PATH=$PATH" npm run build-to-prod <<< "${USER_PASS}"
+  fi
+  
+  # Update cache after successful build
+  echo "${CURRENT_COMMIT}" > "${FE_CACHE_FILE}"
+  echo ">>> Cache updated: ${FE_CACHE_FILE}"
 fi
 
 set +v
