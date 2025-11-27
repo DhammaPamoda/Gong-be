@@ -70,6 +70,38 @@ else
   echo "FTDI D2XX headers found at /usr/local/include/ftd2xx.h"
 fi
 
+# Setup FTDI D2XX for direct USB access (required for ftdi-d2xx package)
+# 1. Blacklist kernel modules that would claim the device
+if [ ! -f "/etc/modprobe.d/ftdi-blacklist.conf" ]; then
+  echo "Setting up FTDI kernel module blacklist..."
+  echo -e "blacklist ftdi_sio\nblacklist usbserial" | sudo -S tee /etc/modprobe.d/ftdi-blacklist.conf <<< "${USER_PASS}" >/dev/null
+  sudo -S update-initramfs -u <<< "${USER_PASS}" 2>/dev/null || true
+  echo "FTDI kernel modules blacklisted (ftdi_sio, usbserial)"
+else
+  echo "FTDI kernel module blacklist already configured"
+fi
+
+# 2. Create udev rule for USB device permissions
+if [ ! -f "/etc/udev/rules.d/99-ftdi.rules" ]; then
+  echo "Setting up FTDI udev rules..."
+  echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", MODE="0666", GROUP="plugdev"' | sudo -S tee /etc/udev/rules.d/99-ftdi.rules <<< "${USER_PASS}" >/dev/null
+  sudo -S udevadm control --reload-rules <<< "${USER_PASS}" 2>/dev/null || true
+  sudo -S udevadm trigger <<< "${USER_PASS}" 2>/dev/null || true
+  echo "FTDI udev rules installed"
+else
+  echo "FTDI udev rules already configured"
+fi
+
+# 3. Unload kernel modules if currently loaded (for immediate effect)
+if lsmod | grep -q ftdi_sio; then
+  echo "Unloading ftdi_sio kernel module..."
+  sudo -S rmmod ftdi_sio <<< "${USER_PASS}" 2>/dev/null || true
+fi
+if lsmod | grep -q usbserial; then
+  echo "Unloading usbserial kernel module..."
+  sudo -S rmmod usbserial <<< "${USER_PASS}" 2>/dev/null || true
+fi
+
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
@@ -109,3 +141,16 @@ echo
 echo -e "⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆"
 echo -e "SCRIPT : refresh_gong_server_be.sh HAS ENDED   ************************ END ************************"
 echo -e "╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩"
+
+
+# Some additional notes to handle the installation of FTDI D2XX headers:
+# What Was Added to refresh_gong_server_be.sh
+# The script now automatically configures:
+# Kernel Module Blacklist (/etc/modprobe.d/ftdi-blacklist.conf)
+# Prevents ftdi_sio and usbserial from loading at boot
+# These modules would claim the FTDI device as /dev/ttyUSB*
+# udev Rule (/etc/udev/rules.d/99-ftdi.rules)
+# Grants plugdev group access to FTDI USB devices
+# Allows non-root users to access the device
+# Immediate Module Unload
+# Unloads the modules if currently loaded (for immediate effect)
