@@ -40,16 +40,16 @@ fi
 if [ "${IS_DOCKER}" != "true" ]; then
   # Use absolute path to pm2 with sudo and ensure node is in PATH
   if [[ "$PM2_PATH" != "pm2" ]] && [ -f "$PM2_PATH" ]; then
-    sudo -S env "PATH=${PM2_DIR}:$PATH" "${PM2_PATH}" start "/home/${USER}/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.js" <<<"${USER_PASS}"
+    sudo -S env "PATH=${PM2_DIR}:$PATH" "${PM2_PATH}" start "/home/${USER}/projects/gong_dev_ops/dev_ops/ecosystem.config.js" <<<"${USER_PASS}"
   else
-    sudo -S env "PATH=$PATH" pm2 start "/home/${USER}/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.js" <<<"${USER_PASS}"
+    sudo -S env "PATH=$PATH" pm2 start "/home/${USER}/projects/gong_dev_ops/dev_ops/ecosystem.config.js" <<<"${USER_PASS}"
   fi
 else
   # This is relevant only when used in docker env
   if [[ "$PM2_RUNTIME_PATH" != "pm2-runtime" ]] && [ -f "$PM2_RUNTIME_PATH" ]; then
-    sudo -S env "PATH=${PM2_DIR}:$PATH" "${PM2_RUNTIME_PATH}" "/home/${USER}/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.js" <<<"${USER_PASS}"
+    sudo -S env "PATH=${PM2_DIR}:$PATH" "${PM2_RUNTIME_PATH}" "/home/${USER}/projects/gong_dev_ops/dev_ops/ecosystem.config.js" <<<"${USER_PASS}"
   else
-    sudo -S env "PATH=$PATH" pm2-runtime "/home/${USER}/projects/gong_dev_ops/dev_ops/gong_server_pm2_config.js" <<<"${USER_PASS}"
+    sudo -S env "PATH=$PATH" pm2-runtime "/home/${USER}/projects/gong_dev_ops/dev_ops/ecosystem.config.js" <<<"${USER_PASS}"
   fi
 fi
 
