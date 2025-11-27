@@ -10,6 +10,8 @@
  * compatibility issues exist.
  */
 
+const EventEmitter = require('events');
+
 let FTDI;
 try {
   FTDI = require('ftdi-d2xx');
@@ -46,9 +48,11 @@ function convertPortsArrayToByte(portArray) {
 
 /**
  * Wrapper class to mimic ft245rl FtdiDevice behavior
+ * Extends EventEmitter to support 'error', 'open', 'data', 'close' events
  */
-class FtdiDeviceWrapper {
+class FtdiDeviceWrapper extends EventEmitter {
   constructor(deviceInfo, device) {
+    super();
     this.deviceInfo = deviceInfo;
     this.device = device;
     this.deviceSettings = {
@@ -57,7 +61,6 @@ class FtdiDeviceWrapper {
       vendorId: deviceInfo.usb_vid,
       productId: deviceInfo.usb_pid
     };
-    this.eventEmitter = null; // Event emitters not directly supported, would need polyfill
   }
 
   /**
@@ -81,6 +84,8 @@ class FtdiDeviceWrapper {
       // Some devices may not support bit mode, continue anyway
     }
 
+    // Emit 'open' event for compatibility with ft245rl
+    this.emit('open');
     return Promise.resolve();
   }
 
@@ -91,6 +96,8 @@ class FtdiDeviceWrapper {
     if (this.device) {
       this.device.close();
       this.device = null;
+      // Emit 'close' event for compatibility with ft245rl
+      this.emit('close');
     }
     return Promise.resolve();
   }
@@ -130,7 +137,15 @@ const ftdiD2xxWrapper = {
 
       // Use first device
       const deviceInfo = deviceList[0];
-      const device = await FTDI.openDevice(deviceInfo.serial_number);
+      
+      // Try to open by serial number first, fall back to index if serial is empty
+      let device;
+      if (deviceInfo.serial_number && deviceInfo.serial_number.trim() !== '') {
+        device = await FTDI.openDevice(deviceInfo.serial_number);
+      } else {
+        // Open by index (0 = first device) when serial number is empty
+        device = await FTDI.openDevice(0);
+      }
       
       const wrapper = new FtdiDeviceWrapper(deviceInfo, device);
       
