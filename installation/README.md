@@ -2,6 +2,26 @@
 
 This folder contains scripts for setting up a fresh machine to run the Gong Server.
 
+## TL;DR
+
+```bash
+curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/main/installation/bootstrap_clean_machine.sh
+chmod +x bootstrap_clean_machine.sh
+./bootstrap_clean_machine.sh
+# Log out and back in, then:
+./docker_init.sh <USER> <USER_PASS> <IS_DOCKER>
+```
+
+**With specific branch:**
+```bash
+curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/<BRANCH>/installation/bootstrap_clean_machine.sh
+chmod +x bootstrap_clean_machine.sh
+./bootstrap_clean_machine.sh <BRANCH>
+./docker_init.sh <USER> <USER_PASS> <IS_DOCKER> <GONG_BE_BRANCH> <GONG_FE_BRANCH>
+```
+
+---
+
 ## System Requirements
 
 | Component | Version |
