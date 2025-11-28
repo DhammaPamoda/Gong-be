@@ -4,7 +4,9 @@
   "scripts": {
     "lint": "eslint server lib routes",
     "lint:fix": "npm run lint -- --fix",
+    "prestart": "./dev_ops/ensure_ftdi_binary.sh",
     "start": "NO_OF_PORTS=8 NODE_ENV=development babel-node server",
+    "prestart-https": "./dev_ops/ensure_ftdi_binary.sh",
     "start-https": "NO_OF_PORTS=8 NODE_ENV=development HTTPS=true babel-node server",
     "clean": "find ../gong_server/** | grep -v '/dist' | xargs rm -rf && mkdir -p ../gong_server",
     "copy-modules": "cp -rf node_modules ../gong_server",
@@ -16,8 +18,11 @@
     "build-server": "babel ./ -s -d ../gong_server --ignore \"build\",\"dist\",\"test\",\"jest\",\"node_modules\"",
     "build": "npm run clean && npm run build-server && npm run copy",
     "start-deployed": "cd ../gong_server && NO_OF_PORTS=8 NODE_ENV=production node ../gong_server/server",
+    "prestart-nodemon": "./dev_ops/ensure_ftdi_binary.sh",
     "start-nodemon": "nodemon --exec babel-node server",
+    "predebug": "./dev_ops/ensure_ftdi_binary.sh",
     "debug": "NO_OF_PORTS=8 NODE_ENV=development babel-node --inspect-brk server",
+    "predebug-https": "./dev_ops/ensure_ftdi_binary.sh",
     "debug-https": "NO_OF_PORTS=8 NODE_ENV=development HTTPS=true babel-node --inspect-brk server"
   },
   "dependencies": {
