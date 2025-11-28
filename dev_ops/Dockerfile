@@ -3,8 +3,8 @@ FROM ubuntu:18.04
 # update apt and ibstall essentials 
 RUN apt-get update && apt-get install jq curl sudo nano git vim ffmpeg build-essential -y
 
-# install node
-RUN curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
+# install node 18 LTS
+RUN curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 RUN apt-get install -y nodejs
 
 # install pm2 
@@ -24,7 +24,7 @@ RUN rm -fr ftdi
 RUN /sbin/ldconfig -v
 
 # args
-ARG USER=dhamma
+ARG USER=p-admin
 ARG PW=123456
 ARG UID=1000
 

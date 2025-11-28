@@ -20,3 +20,4 @@ node_modules/
 build/
 dist/
 Gong-be-fe.code-workspace
+assets/data/coursesSchedule.json
