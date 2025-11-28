@@ -19,3 +19,5 @@ node_modules/
 # Build
 build/
 dist/
+Gong-be-fe.code-workspace
+assets/data/coursesSchedule.json

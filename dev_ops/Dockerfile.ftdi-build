@@ -1,0 +1,42 @@
+FROM ubuntu:20.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update apt and install build essentials
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    curl \
+    git \
+    jq \
+    nano \
+    sudo \
+    vim \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 18.x (matching host version)
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Install cmake-js globally
+RUN npm install -g cmake-js
+
+# Install FTDI D2XX drivers and headers
+RUN mkdir -p /ftdi && \
+    curl -L https://ftdichip.com/wp-content/uploads/2022/07/libftd2xx-x86_64-1.4.27.tgz -o /ftdi/libftd2xx-x86_64-1.4.27.tgz && \
+    tar xfvz /ftdi/libftd2xx-x86_64-1.4.27.tgz -C /ftdi && \
+    cp /ftdi/release/build/lib* /usr/local/lib/ || true && \
+    ln -sf /usr/local/lib/libftd2xx.so.1.4.27 /usr/local/lib/libftd2xx.so && \
+    chmod 0755 /usr/local/lib/libftd2xx.so && \
+    cp /ftdi/release/*.h /usr/local/include/ && \
+    /sbin/ldconfig -v && \
+    rm -rf /ftdi
+
+# Set working directory
+WORKDIR /build
+
+# Default command (will be overridden by build script)
+CMD ["/bin/bash"]
+

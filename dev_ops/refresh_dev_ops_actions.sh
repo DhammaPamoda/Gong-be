@@ -14,6 +14,9 @@ echo
 
 set -v
 
+GONG_BE_BRANCH=$1
+GONG_BE_BRANCH=${GONG_BE_BRANCH:-master}
+
 now=$(date +"%Y_%m_%d_%H_%M_%S")
 mkdir -p /home/dhamma/projects/gong_dev_ops/dev_ops_backups
 newBackupDir="/home/dhamma/projects/gong_dev_ops/dev_ops_backups/${now}"
@@ -31,13 +34,13 @@ set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 set -v
-git fetch
+git fetch origin "${GONG_BE_BRANCH}"
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 set -v
-git checkout origin/master -- dev_ops
+git checkout "origin/${GONG_BE_BRANCH}" -- dev_ops
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"

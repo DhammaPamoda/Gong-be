@@ -18,6 +18,19 @@ router.post('/playGong', (req, res) => {
       err.httpStatusCode || 500, 'Failed to play gong ', err));
 });
 
+router.post('/cancelGong', (req, res) => {
+  const wasCanceled = relayAndSoundManager.cancelCurrentGong();
+  responder.send200Response(res, { 
+    gongCanceled: wasCanceled,
+    message: wasCanceled ? 'Gong canceled successfully' : 'No gong was playing'
+  });
+});
+
+router.get('/isGongPlaying', (req, res) => {
+  const isPlaying = relayAndSoundManager.isGongPlaying();
+  responder.send200Response(res, { isPlaying });
+});
+
 router.post('/toggleSwitch', (req, res) => {
   responseJson.relayNo = req.body.switch;
 
