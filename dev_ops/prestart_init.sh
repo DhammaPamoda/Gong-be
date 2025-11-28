@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Lightweight script to ensure ftdi-d2xx binary is in place before starting the server
-# Uses cached binary if available, otherwise prompts for build
+# Pre-start initialization script for Gong backend
+# Runs before server startup to ensure environment is ready
+#
+# Tasks:
+#   1. Unload kernel FTDI drivers (for direct device access)
+#   2. Initialize data files from templates (for new environments)
+#   3. Ensure ftdi-d2xx binary is in place (uses cached binary if available)
 
 # Unload kernel FTDI drivers that interfere with ftdi-d2xx library
 # The ftdi_sio kernel module claims FTDI devices, preventing direct access
@@ -16,6 +21,14 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GONG_BE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# Ensure data files exist (copy from example templates if missing)
+DATA_DIR="${GONG_BE_DIR}/assets/data"
+if [ ! -f "${DATA_DIR}/coursesSchedule.json" ] && [ -f "${DATA_DIR}/coursesSchedule.example.json" ]; then
+    echo "Initializing coursesSchedule.json from template..."
+    cp "${DATA_DIR}/coursesSchedule.example.json" "${DATA_DIR}/coursesSchedule.json"
+fi
+
 CACHE_DIR="${HOME}/.cache/ftdi-d2xx"
 CACHED_BINARY="${CACHE_DIR}/ftdi-d2xx.Linux.x86_64.node"
 TARGET_DIR="${GONG_BE_DIR}/node_modules/ftdi-d2xx/build/Release"

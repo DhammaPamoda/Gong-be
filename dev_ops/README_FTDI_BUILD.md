@@ -93,7 +93,7 @@ The `ftdi-d2xx` library requires direct access to FTDI USB devices. However, Lin
 
 **Solution:**
 
-The `ensure_ftdi_binary.sh` script (run automatically via `npm prestart`) now unloads the kernel modules:
+The `prestart_init.sh` script (run automatically via `npm prestart`) now unloads the kernel modules:
 
 ```bash
 # Unload kernel FTDI drivers that interfere with ftdi-d2xx library
@@ -105,7 +105,7 @@ if lsmod | grep -q "usbserial"; then
 fi
 ```
 
-**Note:** These rules are also present in the deployment files for production environments. The addition to `ensure_ftdi_binary.sh` ensures the same behavior in the development environment when running `npm start`.
+**Note:** These rules are also present in the deployment files for production environments. The addition to `prestart_init.sh` ensures the same behavior in the development environment when running `npm start`.
 
 **Manual commands (if needed):**
 
