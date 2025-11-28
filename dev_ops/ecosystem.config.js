@@ -1,5 +1,7 @@
 const path = require('path');
-const homeDir = process.env.HOME || process.env.USERPROFILE;
+// Use SUDO_USER to get the original user when running with sudo
+const user = process.env.SUDO_USER || process.env.USER || 'p-admin';
+const homeDir = `/home/${user}`;
 const gongServerDir = path.join(homeDir, 'projects', 'gong_server');
 
 module.exports = {
