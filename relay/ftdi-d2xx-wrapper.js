@@ -138,13 +138,26 @@ const ftdiD2xxWrapper = {
       // Use first device
       const deviceInfo = deviceList[0];
       
-      // Try to open by serial number first, fall back to index if serial is empty
+      // Log device info for debugging (stringify to see all fields)
+      logger.relayAndSoundManager.info(`FTDI device info: ${JSON.stringify(deviceInfo)}`);
+      
+      // Try to open by serial number first, fall back to other identifiers if serial is empty
+      // API accepts: serial_number (string), usb_loc_id (number), or description (string)
       let device;
       if (deviceInfo.serial_number && deviceInfo.serial_number.trim() !== '') {
+        logger.relayAndSoundManager.info('Opening FTDI by serial number', { serial: deviceInfo.serial_number });
         device = await FTDI.openDevice(deviceInfo.serial_number);
+      } else if (deviceInfo.description && deviceInfo.description.trim() !== '') {
+        // Open by description when serial number is empty
+        logger.relayAndSoundManager.info('Opening FTDI by description', { description: deviceInfo.description });
+        device = await FTDI.openDevice({ description: deviceInfo.description });
+      } else if (deviceInfo.usb_loc_id !== undefined && deviceInfo.usb_loc_id !== 0) {
+        // Open by USB location ID
+        logger.relayAndSoundManager.info('Opening FTDI by usb_loc_id', { usb_loc_id: deviceInfo.usb_loc_id });
+        device = await FTDI.openDevice({ usb_loc_id: deviceInfo.usb_loc_id });
       } else {
-        // Open by index (0 = first device) when serial number is empty
-        device = await FTDI.openDevice(0);
+        // No valid identifier available - throw descriptive error
+        throw new Error(`Cannot open FTDI device: no valid identifier available. Device info: ${JSON.stringify(deviceInfo)}`);
       }
       
       const wrapper = new FtdiDeviceWrapper(deviceInfo, device);
