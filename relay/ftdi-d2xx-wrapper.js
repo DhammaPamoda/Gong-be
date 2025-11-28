@@ -47,6 +47,23 @@ function convertPortsArrayToByte(portArray) {
 }
 
 /**
+ * Helper function to open device by deviceInfo
+ * @param {Object} deviceInfo - Device info from getDeviceInfoList
+ * @returns {Promise<Object>} Opened device
+ */
+async function openDeviceByInfo(deviceInfo) {
+  if (deviceInfo.serial_number && deviceInfo.serial_number.trim() !== '') {
+    return await FTDI.openDevice(deviceInfo.serial_number);
+  } else if (deviceInfo.description && deviceInfo.description.trim() !== '') {
+    return await FTDI.openDevice({ description: deviceInfo.description });
+  } else if (deviceInfo.usb_loc_id !== undefined && deviceInfo.usb_loc_id !== 0) {
+    return await FTDI.openDevice({ usb_loc_id: deviceInfo.usb_loc_id });
+  } else {
+    throw new Error(`Cannot open FTDI device: no valid identifier available. Device info: ${JSON.stringify(deviceInfo)}`);
+  }
+}
+
+/**
  * Wrapper class to mimic ft245rl FtdiDevice behavior
  * Extends EventEmitter to support 'error', 'open', 'data', 'close' events
  */
@@ -65,28 +82,36 @@ class FtdiDeviceWrapper extends EventEmitter {
 
   /**
    * Open the device with bit bang mode configuration
+   * If device was closed, reopen it first
    */
   async open() {
+    // If device was closed, reopen it using stored deviceInfo
     if (!this.device) {
-      throw new Error('Device not initialized');
+      if (!FTDI) {
+        throw new Error('FTDI module not available');
+      }
+      logger.relayAndSoundManager.info('Reopening closed FTDI device');
+      this.device = await openDeviceByInfo(this.deviceInfo);
     }
 
     // Configure device for bit bang mode (same as original ft245rl)
-    // Note: ftdi-d2xx uses different API, may need adjustment
-    this.device.setTimeouts(1000, 1000);
+    try {
+      this.device.setTimeouts(1000, 1000);
+    } catch (error) {
+      logger.relayAndSoundManager.warn('Could not set timeouts', { error: error?.message || error });
+    }
     
     // Set bit mode for relay control (sync bit bang with all bits)
     // FT_BITMODE_SYNC_BITBANG = 0x04 (from FTDI constants)
     try {
       this.device.setBitMode(0xff, 0x04); // bitmask 0xff, mode SYNC_BITBANG
     } catch (error) {
-      logger.relayAndSoundManager.warn('Could not set bit mode, trying without it', { error });
+      logger.relayAndSoundManager.warn('Could not set bit mode, trying without it', { error: error?.message || error });
       // Some devices may not support bit mode, continue anyway
     }
 
     // Emit 'open' event for compatibility with ft245rl
     this.emit('open');
-    return Promise.resolve();
   }
 
   /**
@@ -94,12 +119,15 @@ class FtdiDeviceWrapper extends EventEmitter {
    */
   async close() {
     if (this.device) {
-      this.device.close();
+      try {
+        this.device.close();
+      } catch (error) {
+        logger.relayAndSoundManager.warn('Error closing device', { error: error?.message || error });
+      }
       this.device = null;
       // Emit 'close' event for compatibility with ft245rl
       this.emit('close');
     }
-    return Promise.resolve();
   }
 
   /**
@@ -112,7 +140,6 @@ class FtdiDeviceWrapper extends EventEmitter {
     }
     const uint8Array = Uint8Array.from(dataArray);
     await this.device.write(uint8Array);
-    return Promise.resolve();
   }
 }
 
@@ -141,24 +168,8 @@ const ftdiD2xxWrapper = {
       // Log device info for debugging (stringify to see all fields)
       logger.relayAndSoundManager.info(`FTDI device info: ${JSON.stringify(deviceInfo)}`);
       
-      // Try to open by serial number first, fall back to other identifiers if serial is empty
-      // API accepts: serial_number (string), usb_loc_id (number), or description (string)
-      let device;
-      if (deviceInfo.serial_number && deviceInfo.serial_number.trim() !== '') {
-        logger.relayAndSoundManager.info('Opening FTDI by serial number', { serial: deviceInfo.serial_number });
-        device = await FTDI.openDevice(deviceInfo.serial_number);
-      } else if (deviceInfo.description && deviceInfo.description.trim() !== '') {
-        // Open by description when serial number is empty
-        logger.relayAndSoundManager.info('Opening FTDI by description', { description: deviceInfo.description });
-        device = await FTDI.openDevice({ description: deviceInfo.description });
-      } else if (deviceInfo.usb_loc_id !== undefined && deviceInfo.usb_loc_id !== 0) {
-        // Open by USB location ID
-        logger.relayAndSoundManager.info('Opening FTDI by usb_loc_id', { usb_loc_id: deviceInfo.usb_loc_id });
-        device = await FTDI.openDevice({ usb_loc_id: deviceInfo.usb_loc_id });
-      } else {
-        // No valid identifier available - throw descriptive error
-        throw new Error(`Cannot open FTDI device: no valid identifier available. Device info: ${JSON.stringify(deviceInfo)}`);
-      }
+      // Open device using the helper function
+      const device = await openDeviceByInfo(deviceInfo);
       
       const wrapper = new FtdiDeviceWrapper(deviceInfo, device);
       
@@ -181,12 +192,11 @@ const ftdiD2xxWrapper = {
     if (!FTDI) {
       throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
     }
-    if (!deviceWrapper || !deviceWrapper.device) {
-      throw new Error('Invalid device');
+    if (!deviceWrapper) {
+      throw new Error('Invalid device wrapper');
     }
-    // Device is already open when created, just ensure it's configured
+    // Open will reopen if device was closed
     await deviceWrapper.open();
-    return Promise.resolve();
   },
 
   /**
@@ -195,13 +205,9 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<void>}
    */
   async closeDevice(deviceWrapper) {
-    if (!FTDI) {
-      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
-    }
     if (deviceWrapper) {
       await deviceWrapper.close();
     }
-    return Promise.resolve();
   },
 
   /**
@@ -211,15 +217,11 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<void>}
    */
   async switchAllPorts(deviceWrapper, isOn) {
-    if (!FTDI) {
-      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
-    }
     if (!deviceWrapper || !deviceWrapper.device) {
-      throw new Error('Invalid device');
+      throw new Error('Device not open - call openDevice first');
     }
     const byteValue = isOn ? 0xff : 0x00;
     await deviceWrapper.write([byteValue]);
-    return Promise.resolve();
   },
 
   /**
@@ -229,11 +231,8 @@ const ftdiD2xxWrapper = {
    * @returns {Promise<void>}
    */
   async switchPorts(deviceWrapper, portArray) {
-    if (!FTDI) {
-      throw new Error('ftdi-d2xx module is not available. Please rebuild the package for your system.');
-    }
     if (!deviceWrapper || !deviceWrapper.device) {
-      throw new Error('Invalid device');
+      throw new Error('Device not open - call openDevice first');
     }
     if (!portArray || !Array.isArray(portArray)) {
       throw new Error('Invalid port array');
@@ -244,7 +243,6 @@ const ftdiD2xxWrapper = {
     
     const byteValue = convertPortsArrayToByte(portArray);
     await deviceWrapper.write([byteValue]);
-    return Promise.resolve();
   }
 };
 
