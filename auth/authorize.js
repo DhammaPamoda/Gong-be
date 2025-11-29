@@ -39,7 +39,21 @@ function authorize(roles = []) {
       algorithms: ['HS256'],
       requestProperty: 'user', // Default is 'auth', but we use 'user' for backward compatibility
     })
-      .unless({ path: ['/login', '/nextgong', '/api/login', '/api/nextgong', '/api/relay/isGongPlaying', '/api/relay/cancelGong', '/api/relay/playGong'] }),
+      .unless({
+        path: [
+          '/login',
+          '/nextgong',
+          '/api/login',
+          '/api/nextgong',
+          '/api/relay/isGongPlaying',
+          '/api/relay/cancelGong',
+          '/api/relay/playGong',
+          '/loginPage',
+          '/mainPage',
+          '/favicon.ico',
+          /^\/\.well-known\/.*/,  // Chrome DevTools and other well-known paths
+        ]
+      }),
 
     // authorize based on user role
     (err, req, res, next) => {
