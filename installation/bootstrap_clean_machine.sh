@@ -13,15 +13,15 @@ set -e
 # ==========================================
 #
 # Usage: ./bootstrap_clean_machine.sh [GONG_BE_BRANCH]
-#   GONG_BE_BRANCH: Optional. Branch to download scripts from (default: main)
+#   GONG_BE_BRANCH: Optional. Branch to download scripts from (default: master)
 #
 # Examples:
-#   ./bootstrap_clean_machine.sh              # Uses main branch
+#   ./bootstrap_clean_machine.sh              # Uses master branch
 #   ./bootstrap_clean_machine.sh develop      # Uses develop branch
 #   ./bootstrap_clean_machine.sh feature/xyz  # Uses feature/xyz branch
 # ==========================================
 
-GONG_BE_BRANCH="${1:-main}"
+GONG_BE_BRANCH="${1:-master}"
 REPO_BASE_URL="https://raw.githubusercontent.com/DhammaPamoda/Gong-be/${GONG_BE_BRANCH}"
 
 # ==========================================
@@ -150,7 +150,7 @@ remove_old_docker() {
 echo "=========================================="
 echo "Gong Server - Clean Machine Bootstrap"
 echo "=========================================="
-if [ "$GONG_BE_BRANCH" != "main" ]; then
+if [ "$GONG_BE_BRANCH" != "master" ]; then
   echo "Using branch: $GONG_BE_BRANCH"
 fi
 echo
@@ -302,7 +302,7 @@ echo "  - deploy_gong_actions.sh"
 echo
 
 BRANCH_HINT=""
-if [ "$GONG_BE_BRANCH" != "main" ]; then
+if [ "$GONG_BE_BRANCH" != "master" ]; then
   BRANCH_HINT=" ${GONG_BE_BRANCH}"
 fi
 
