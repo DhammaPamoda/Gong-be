@@ -22,12 +22,40 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 GONG_BE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Ensure data files exist (copy from example templates if missing)
-DATA_DIR="${GONG_BE_DIR}/assets/data"
-if [ ! -f "${DATA_DIR}/coursesSchedule.json" ] && [ -f "${DATA_DIR}/coursesSchedule.example.json" ]; then
-    echo "Initializing coursesSchedule.json from template..."
-    cp "${DATA_DIR}/coursesSchedule.example.json" "${DATA_DIR}/coursesSchedule.json"
+# ==========================================
+# XDG Data Directory Setup
+# ==========================================
+# Application data is stored in ~/.local/share/gong/ following XDG Base Directory Specification
+# This avoids permission issues when deploying with sudo
+
+XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
+GONG_DATA_DIR="${XDG_DATA_HOME}/gong"
+
+# Create XDG data directory if it doesn't exist
+if [ ! -d "${GONG_DATA_DIR}" ]; then
+    echo "Creating Gong data directory: ${GONG_DATA_DIR}"
+    mkdir -p "${GONG_DATA_DIR}"
 fi
+
+# Initialize dynamic data files if they don't exist
+# These files are writable by the application at runtime
+init_data_file() {
+    local filename="$1"
+    local default_content="$2"
+    local filepath="${GONG_DATA_DIR}/${filename}"
+    
+    if [ ! -f "${filepath}" ]; then
+        echo "Initializing ${filename}..."
+        echo "${default_content}" > "${filepath}"
+    fi
+}
+
+init_data_file "coursesSchedule.json" "[]"
+init_data_file "archivedCoursesSchedule.json" "[]"
+init_data_file "manualGong.json" "[]"
+init_data_file "obsoleteManualGong.json" "[]"
+
+echo "Gong data directory ready: ${GONG_DATA_DIR}"
 
 CACHE_DIR="${HOME}/.cache/ftdi-d2xx"
 CACHED_BINARY="${CACHE_DIR}/ftdi-d2xx.Linux.x86_64.node"

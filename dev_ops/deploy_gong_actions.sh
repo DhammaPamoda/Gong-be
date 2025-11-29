@@ -69,6 +69,27 @@ cp -rf "${BASE_DIR}/Gong-be/dev_ops" "${GONG_DEV_OPS_DIR}/"
 cp -f "${DEV_OPS_FILES_DIR}/refresh_dev_ops.sh" "${GONG_DEV_OPS_DIR}/"
 cp -f "${DEV_OPS_FILES_DIR}/refresh_gong_server.sh" "${GONG_DEV_OPS_DIR}/"
 
+# ==========================================
+# XDG Data Directory Setup
+# ==========================================
+# Application data is stored in ~/.local/share/gong/ following XDG Base Directory Specification
+echo "Setting up Gong data directory..."
+XDG_DATA_HOME="${XDG_DATA_HOME:-/home/${USER}/.local/share}"
+GONG_DATA_DIR="${XDG_DATA_HOME}/gong"
+mkdir -p "${GONG_DATA_DIR}"
+
+# Initialize empty data files if they don't exist
+for file in coursesSchedule.json archivedCoursesSchedule.json manualGong.json obsoleteManualGong.json; do
+    if [ ! -f "${GONG_DATA_DIR}/${file}" ]; then
+        echo "[]" > "${GONG_DATA_DIR}/${file}"
+        echo "  Initialized: ${file}"
+    fi
+done
+
+# Ensure proper ownership (files created by this script belong to the user)
+chown -R "${USER}:${USER}" "${GONG_DATA_DIR}"
+echo "Gong data directory ready: ${GONG_DATA_DIR}"
+
 # Building the BE and FE
 "${DEV_OPS_FILES_DIR}"/refresh_gong_server_be.sh "${USER}" "${USER_PASS}" "${GONG_BE_BRANCH}"
 "${DEV_OPS_FILES_DIR}"/refresh_gong_server_fe.sh "${USER}" "${USER_PASS}" "${GONG_FE_BRANCH}"

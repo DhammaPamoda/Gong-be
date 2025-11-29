@@ -7,6 +7,7 @@ const gongsManager = require('../../lib/gongsManager');
 const persistManager = require('../../lib/persist/persistManager');
 const utilsManager = require('../../lib/utilsManager');
 const logger = require('../../lib//logger');
+const dataPaths = require('../../lib/config/dataPaths');
 
 const NO_OF_PORTS = process.env.NO_OF_PORTS ? Number.parseInt(process.env.NO_OF_PORTS, 10) : 4;
 
@@ -45,7 +46,7 @@ function getStaticData(req, res, next) {
 }
 
 function getCoursesSchedule(req, res, next) {
-  const rawData = fs.readFileSync('assets/data/coursesSchedule.json');
+  const rawData = fs.readFileSync(dataPaths.getDataFilePath('coursesSchedule.json'));
   const coursesSchedule = JSON.parse(rawData);
   responder.send200Response(res, coursesSchedule);
 }
