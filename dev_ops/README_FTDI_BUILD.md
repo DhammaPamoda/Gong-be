@@ -15,7 +15,7 @@ This process builds the `ftdi-d2xx` native module binary in a Docker container w
 For a fresh Ubuntu/Debian machine, run the bootstrap script first:
 
 ```bash
-curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/main/installation/bootstrap_clean_machine.sh
+curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/master/installation/bootstrap_clean_machine.sh
 chmod +x bootstrap_clean_machine.sh
 ./bootstrap_clean_machine.sh
 ```

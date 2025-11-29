@@ -5,7 +5,7 @@ This folder contains scripts for setting up a fresh machine to run the Gong Serv
 ## TL;DR
 
 ```bash
-curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/main/installation/bootstrap_clean_machine.sh
+curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/master/installation/bootstrap_clean_machine.sh
 chmod +x bootstrap_clean_machine.sh
 ./bootstrap_clean_machine.sh
 # Log out and back in, then:
@@ -40,7 +40,7 @@ chmod +x bootstrap_clean_machine.sh
 
 ```bash
 # Download bootstrap script
-curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/main/installation/bootstrap_clean_machine.sh
+curl -O https://raw.githubusercontent.com/DhammaPamoda/Gong-be/master/installation/bootstrap_clean_machine.sh
 chmod +x bootstrap_clean_machine.sh
 
 # Run it
@@ -104,7 +104,7 @@ To bootstrap using scripts from a specific branch:
 ./bootstrap_clean_machine.sh feature/my-feature
 ```
 
-This downloads deployment scripts from the specified branch instead of `main`.
+This downloads deployment scripts from the specified branch instead of `master`.
 
 ## After Installation
 
