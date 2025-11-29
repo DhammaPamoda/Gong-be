@@ -1,5 +1,23 @@
 # Running Gong Server with PM2
 
+## Important: Root vs User Mode
+
+PM2 can run in two separate modes:
+- **User mode** (`pm2 ...`) - runs as your user, processes in `~/.pm2/`
+- **Root mode** (`sudo pm2 ...`) - runs as root, processes in `/root/.pm2/`
+
+These are **separate PM2 daemons** with separate process lists. Choose one and stick with it.
+
+**If switching from root to user mode:**
+```bash
+sudo pm2 stop all
+sudo pm2 delete all
+sudo pm2 save
+sudo pm2 kill
+sudo systemctl disable pm2-root
+sudo systemctl stop pm2-root
+```
+
 ## Start the Server
 
 ```bash
@@ -22,8 +40,8 @@ pm2 save
 ## Verify Persistence
 
 ```bash
-# Check if startup service is enabled
-sudo systemctl status pm2-root
+# Check if startup service is enabled (replace YOUR_USER with your username)
+systemctl status pm2-YOUR_USER
 
 # Check saved processes
 pm2 prettylist | grep name
