@@ -165,6 +165,12 @@ fi
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
+# Ensure data files exist in deployed gong_server (copy from templates if missing)
+GONG_SERVER_DATA="/home/${USER}/projects/gong_server/assets/data"
+if [ ! -f "${GONG_SERVER_DATA}/coursesSchedule.json" ] && [ -f "${GONG_SERVER_DATA}/coursesSchedule.example.json" ]; then
+    echo "Initializing coursesSchedule.json from template in gong_server..."
+    sudo -S cp "${GONG_SERVER_DATA}/coursesSchedule.example.json" "${GONG_SERVER_DATA}/coursesSchedule.json" <<< "${USER_PASS}"
+fi
 
 echo
 echo
