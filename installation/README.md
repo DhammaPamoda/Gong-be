@@ -118,10 +118,9 @@ Once deployment completes, the Gong server will be:
 ```bash
 # Start using the config file (recommended)
 pm2 start ~/projects/gong_dev_ops/dev_ops/ecosystem.config.js
-
-# Or with sudo if needed
-sudo pm2 start ~/projects/gong_dev_ops/dev_ops/ecosystem.config.js
 ```
+
+> ⚠️ **Important:** Do NOT run pm2 with sudo. Running `sudo pm2` creates a separate PM2 daemon under `/root/.pm2` which conflicts with your user's PM2 daemon. Always run pm2 as your regular user.
 
 ### Useful PM2 Commands
 
@@ -157,6 +156,8 @@ sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -
 ```
 
 **Important:** Copy and run the exact command that PM2 outputs (it's customized to your system).
+
+> **Note:** This sudo command is only for installing the systemd service (one-time setup). Regular pm2 commands (`pm2 start`, `pm2 restart`, etc.) should be run WITHOUT sudo.
 
 ```bash
 # Step 2: Save the current process list

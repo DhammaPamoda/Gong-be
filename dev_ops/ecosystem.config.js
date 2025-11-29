@@ -1,6 +1,6 @@
 const path = require('path');
-// Use SUDO_USER to get the original user when running with sudo
-const user = process.env.SUDO_USER || process.env.USER || 'p-admin';
+// Use regular user - do NOT run pm2 with sudo to avoid creating a separate root PM2 daemon
+const user = process.env.USER;
 const homeDir = `/home/${user}`;
 const gongServerDir = path.join(homeDir, 'projects', 'gong_server');
 
