@@ -52,10 +52,10 @@ if [ ! -f "/usr/local/include/ftd2xx.h" ]; then
     if [ -f "libftd2xx-x86_64-1.4.27.tgz" ]; then
       sudo -S tar xfvz libftd2xx-x86_64-1.4.27.tgz <<< "${USER_PASS}" || echo "Warning: Failed to extract FTDI library"
       if [ -d "release" ]; then
-        sudo -S cp release/build/lib* /usr/local/lib/ 2>/dev/null || true <<< "${USER_PASS}"
-        sudo -S ln -sf /usr/local/lib/libftd2xx.so.1.4.27 /usr/local/lib/libftd2xx.so 2>/dev/null || true <<< "${USER_PASS}"
-        sudo -S cp release/*.h /usr/local/include/ 2>/dev/null || true <<< "${USER_PASS}"
-        sudo -S /sbin/ldconfig 2>/dev/null || true <<< "${USER_PASS}"
+        echo "${USER_PASS}" | sudo -S cp release/build/lib* /usr/local/lib/ 2>/dev/null || true
+        echo "${USER_PASS}" | sudo -S ln -sf /usr/local/lib/libftd2xx.so.1.4.27 /usr/local/lib/libftd2xx.so 2>/dev/null || true
+        echo "${USER_PASS}" | sudo -S cp release/*.h /usr/local/include/ 2>/dev/null || true
+        echo "${USER_PASS}" | sudo -S /sbin/ldconfig 2>/dev/null || true
         echo "FTDI D2XX headers installed successfully"
       fi
     else
@@ -84,8 +84,11 @@ install usbserial /bin/true"
 # Check if blacklist needs to be created or updated (if missing install directive)
 if [ ! -f "/etc/modprobe.d/ftdi-blacklist.conf" ] || ! grep -q "install ftdi_sio" /etc/modprobe.d/ftdi-blacklist.conf; then
   echo "Setting up FTDI kernel module blacklist (with install directive)..."
-  echo "${FTDI_BLACKLIST_CONTENT}" | sudo -S tee /etc/modprobe.d/ftdi-blacklist.conf <<< "${USER_PASS}" >/dev/null
-  sudo -S update-initramfs -u <<< "${USER_PASS}" 2>/dev/null || true
+  # Use bash -c to write content (can't use both pipe and <<< for stdin)
+  echo "${USER_PASS}" | sudo -S bash -c "cat > /etc/modprobe.d/ftdi-blacklist.conf << 'BLACKLIST_EOF'
+${FTDI_BLACKLIST_CONTENT}
+BLACKLIST_EOF"
+  echo "${USER_PASS}" | sudo -S update-initramfs -u 2>/dev/null || true
   echo "FTDI kernel modules blacklisted (ftdi_sio, usbserial) with install directive"
 else
   echo "FTDI kernel module blacklist already configured with install directive"
@@ -94,9 +97,9 @@ fi
 # 2. Create udev rule for USB device permissions
 if [ ! -f "/etc/udev/rules.d/99-ftdi.rules" ]; then
   echo "Setting up FTDI udev rules..."
-  echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", MODE="0666", GROUP="plugdev"' | sudo -S tee /etc/udev/rules.d/99-ftdi.rules <<< "${USER_PASS}" >/dev/null
-  sudo -S udevadm control --reload-rules <<< "${USER_PASS}" 2>/dev/null || true
-  sudo -S udevadm trigger <<< "${USER_PASS}" 2>/dev/null || true
+  echo "${USER_PASS}" | sudo -S bash -c 'echo '\''SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", MODE="0666", GROUP="plugdev"'\'' > /etc/udev/rules.d/99-ftdi.rules'
+  echo "${USER_PASS}" | sudo -S udevadm control --reload-rules 2>/dev/null || true
+  echo "${USER_PASS}" | sudo -S udevadm trigger 2>/dev/null || true
   echo "FTDI udev rules installed"
 else
   echo "FTDI udev rules already configured"
