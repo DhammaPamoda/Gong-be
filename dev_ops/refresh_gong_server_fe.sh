@@ -105,17 +105,20 @@ else
   fi
   
   # Copy built dist to cache
+  # Note: Build runs with sudo, so files are root-owned. Use sudo for copy operations.
   FE_BUILD_DIST="/home/${USER}/projects/Gong_fe/dist/gong"
   if [ -d "${FE_BUILD_DIST}" ]; then
     echo ">>> Caching frontend dist..."
-    rm -rf "${FE_DIST_CACHE}"
-    cp -r "${FE_BUILD_DIST}" "${FE_DIST_CACHE}"
+    sudo -S rm -rf "${FE_DIST_CACHE}" <<< "${USER_PASS}"
+    sudo -S cp -r "${FE_BUILD_DIST}" "${FE_DIST_CACHE}" <<< "${USER_PASS}"
+    sudo -S chown -R "${USER}:${USER}" "${FE_DIST_CACHE}" <<< "${USER_PASS}"
     echo ">>> Frontend cached to: ${FE_DIST_CACHE}"
     
     # Copy to gong_server
     echo ">>> Copying frontend dist to gong_server..."
-    rm -rf "${GONG_SERVER_DIST}"
-    cp -r "${FE_BUILD_DIST}" "${GONG_SERVER_DIST}"
+    sudo -S rm -rf "${GONG_SERVER_DIST}" <<< "${USER_PASS}"
+    sudo -S cp -r "${FE_BUILD_DIST}" "${GONG_SERVER_DIST}" <<< "${USER_PASS}"
+    sudo -S chown -R "${USER}:${USER}" "${GONG_SERVER_DIST}" <<< "${USER_PASS}"
     echo ">>> Frontend deployed to: ${GONG_SERVER_DIST}"
   else
     echo ">>> ERROR: Frontend build output not found at ${FE_BUILD_DIST}"
