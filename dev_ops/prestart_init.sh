@@ -8,15 +8,54 @@
 #   2. Initialize data files from templates (for new environments)
 #   3. Ensure ftdi-d2xx binary is in place (uses cached binary if available)
 
-# Unload kernel FTDI drivers that interfere with ftdi-d2xx library
+# ==========================================
+# FTDI Status Logging Setup
+# ==========================================
+FTDI_LOG_DIR="${HOME}/.local/share/gong/logs"
+FTDI_LOG_FILE="${FTDI_LOG_DIR}/ftdi_status.log"
+mkdir -p "${FTDI_LOG_DIR}"
+
+# Function to log FTDI status with timestamp
+log_ftdi_status() {
+    local status="$1"
+    local details="$2"
+    local timestamp
+    timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+    echo "${timestamp} | ${status} | ${details}" >> "${FTDI_LOG_FILE}"
+}
+
+# ==========================================
+# Unload kernel FTDI drivers
+# ==========================================
 # The ftdi_sio kernel module claims FTDI devices, preventing direct access
-# This requires sudo - will silently fail if not available (non-fatal)
+# NOTE: If the blacklist in /etc/modprobe.d/ftdi-blacklist.conf is working correctly,
+#       these modules should NOT be loaded. If they are, it indicates a configuration issue.
+
 if lsmod | grep -q "ftdi_sio"; then
-    echo "Unloading ftdi_sio kernel module to allow direct FTDI access..."
-    sudo rmmod ftdi_sio 2>/dev/null || echo "Note: Could not unload ftdi_sio (may need sudo privileges)"
+    echo "WARNING: ftdi_sio module is loaded despite blacklist!"
+    echo "  This may indicate the blacklist in /etc/modprobe.d/ftdi-blacklist.conf is not working."
+    echo "  Consider running: sudo update-initramfs -u && sudo reboot"
+    echo "Attempting to unload ftdi_sio kernel module..."
+    log_ftdi_status "BLACKLIST_FAILED" "ftdi_sio module was loaded despite blacklist - attempting unload"
+    
+    if sudo rmmod ftdi_sio 2>/dev/null; then
+        echo "Successfully unloaded ftdi_sio module."
+        log_ftdi_status "UNLOAD_SUCCESS" "ftdi_sio module unloaded successfully"
+    else
+        echo "ERROR: Could not unload ftdi_sio (may need sudo privileges). Relay may be inaccessible!"
+        log_ftdi_status "UNLOAD_FAILED" "Could not unload ftdi_sio - relay may be inaccessible"
+    fi
+else
+    log_ftdi_status "BLACKLIST_OK" "ftdi_sio module not loaded - blacklist working correctly"
 fi
+
 if lsmod | grep -q "usbserial"; then
-    sudo rmmod usbserial 2>/dev/null || true
+    echo "Note: usbserial module is loaded, attempting to unload..."
+    if sudo rmmod usbserial 2>/dev/null; then
+        log_ftdi_status "UNLOAD_SUCCESS" "usbserial module unloaded successfully"
+    else
+        log_ftdi_status "UNLOAD_FAILED" "Could not unload usbserial"
+    fi
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

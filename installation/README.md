@@ -211,6 +211,35 @@ rm -rf ~/.cache/gong ~/.cache/ftdi-d2xx
 
 ## Troubleshooting
 
+### Relay Not Accessible After Restart
+
+If the relay is inaccessible after a system restart, the `ftdi_sio` kernel module may be claiming the FTDI USB device.
+
+**Check the FTDI status log:**
+```bash
+cat ~/.local/share/gong/logs/ftdi_status.log
+```
+
+| Log Status | Meaning | Action |
+|------------|---------|--------|
+| `BLACKLIST_OK` | Blacklist working correctly | No action needed |
+| `BLACKLIST_FAILED` | Module loaded despite blacklist | Run fix below |
+| `UNLOAD_SUCCESS` | Module was unloaded successfully | Relay should work |
+| `UNLOAD_FAILED` | Could not unload module | Check sudo permissions |
+
+**To fix blacklist not working:**
+```bash
+# Rebuild initramfs and reboot
+sudo update-initramfs -u
+sudo reboot
+```
+
+**Manual workaround (temporary):**
+```bash
+sudo rmmod ftdi_sio
+sudo rmmod usbserial
+```
+
 ### Docker permission denied
 If you see "permission denied" errors with Docker:
 ```bash

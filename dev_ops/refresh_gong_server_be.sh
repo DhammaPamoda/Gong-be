@@ -72,13 +72,23 @@ fi
 
 # Setup FTDI D2XX for direct USB access (required for ftdi-d2xx package)
 # 1. Blacklist kernel modules that would claim the device
-if [ ! -f "/etc/modprobe.d/ftdi-blacklist.conf" ]; then
-  echo "Setting up FTDI kernel module blacklist..."
-  echo -e "blacklist ftdi_sio\nblacklist usbserial" | sudo -S tee /etc/modprobe.d/ftdi-blacklist.conf <<< "${USER_PASS}" >/dev/null
+# Using both 'blacklist' (prevents auto-loading) and 'install' (prevents ALL loading)
+FTDI_BLACKLIST_CONTENT="# Prevent ftdi_sio and usbserial from claiming FTDI USB devices
+# This allows userspace libraries (ftdi-d2xx) to access devices directly
+blacklist ftdi_sio
+blacklist usbserial
+# install directive completely prevents loading by redirecting to /bin/true
+install ftdi_sio /bin/true
+install usbserial /bin/true"
+
+# Check if blacklist needs to be created or updated (if missing install directive)
+if [ ! -f "/etc/modprobe.d/ftdi-blacklist.conf" ] || ! grep -q "install ftdi_sio" /etc/modprobe.d/ftdi-blacklist.conf; then
+  echo "Setting up FTDI kernel module blacklist (with install directive)..."
+  echo "${FTDI_BLACKLIST_CONTENT}" | sudo -S tee /etc/modprobe.d/ftdi-blacklist.conf <<< "${USER_PASS}" >/dev/null
   sudo -S update-initramfs -u <<< "${USER_PASS}" 2>/dev/null || true
-  echo "FTDI kernel modules blacklisted (ftdi_sio, usbserial)"
+  echo "FTDI kernel modules blacklisted (ftdi_sio, usbserial) with install directive"
 else
-  echo "FTDI kernel module blacklist already configured"
+  echo "FTDI kernel module blacklist already configured with install directive"
 fi
 
 # 2. Create udev rule for USB device permissions
@@ -92,7 +102,21 @@ else
   echo "FTDI udev rules already configured"
 fi
 
-# 3. Unload kernel modules if currently loaded (for immediate effect)
+# 3. Install systemd service as fallback to unload modules at boot
+FTDI_SERVICE_SRC="${BASE_DIR}/Gong-be/dev_ops/ftdi-unload.service"
+if [ -f "${FTDI_SERVICE_SRC}" ] && [ ! -f "/etc/systemd/system/ftdi-unload.service" ]; then
+  echo "Installing ftdi-unload systemd service (boot-time fallback)..."
+  sudo -S cp "${FTDI_SERVICE_SRC}" /etc/systemd/system/ftdi-unload.service <<< "${USER_PASS}"
+  sudo -S systemctl daemon-reload <<< "${USER_PASS}"
+  sudo -S systemctl enable ftdi-unload.service <<< "${USER_PASS}" 2>/dev/null || true
+  echo "ftdi-unload service installed and enabled"
+else
+  if [ -f "/etc/systemd/system/ftdi-unload.service" ]; then
+    echo "ftdi-unload systemd service already installed"
+  fi
+fi
+
+# 4. Unload kernel modules if currently loaded (for immediate effect)
 if lsmod | grep -q ftdi_sio; then
   echo "Unloading ftdi_sio kernel module..."
   sudo -S rmmod ftdi_sio <<< "${USER_PASS}" 2>/dev/null || true

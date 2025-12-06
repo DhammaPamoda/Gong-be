@@ -1,0 +1,18 @@
+[Unit]
+Description=Unload FTDI kernel modules for direct USB access
+Documentation=file:///home/%i/projects/Gong-be/relay/FTDI_MIGRATION_NOTES.md
+# Run early in boot, before most services
+DefaultDependencies=no
+Before=basic.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Unload ftdi_sio and usbserial if loaded (fallback if blacklist didn't work)
+ExecStart=/bin/sh -c 'if lsmod | grep -q ftdi_sio; then rmmod ftdi_sio 2>/dev/null || true; fi'
+ExecStart=/bin/sh -c 'if lsmod | grep -q usbserial; then rmmod usbserial 2>/dev/null || true; fi'
+
+[Install]
+WantedBy=basic.target
+
