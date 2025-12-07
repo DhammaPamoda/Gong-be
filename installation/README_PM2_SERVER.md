@@ -1,5 +1,24 @@
 # Running Gong Server with PM2
 
+## Data Directories
+
+The Gong server stores its data in the following locations:
+
+| Environment | Path |
+|-------------|------|
+| Production  | `~/.local/share/gong/prod/` |
+| Development | `~/.local/share/gong/dev/` |
+
+Each directory contains:
+- `coursesSchedule.json` - Active course schedules
+- `archivedCoursesSchedule.json` - Archived course schedules  
+- `manualGong.json` - Manual gong configurations
+- `obsoleteManualGong.json` - Old manual gong entries
+
+Logs:
+- Application logs: `~/.local/share/gong/logs/`
+- PM2 logs: `~/.pm2/logs/` (includes `gong_server-out.log` and `gong_server-error.log`)
+
 ## Start the Server
 
 ```bash
