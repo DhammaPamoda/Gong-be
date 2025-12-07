@@ -6,6 +6,7 @@ const https = require('https');
 const app = require('./app');
 // const db = require('../lib/db');
 const logger = require('../lib/logger');
+const dataPaths = require('../lib/config/dataPaths');
 
 const scheduleManager = require('../lib/scheduleManager');
 const gongsManager = require('../lib/gongsManager');
@@ -13,6 +14,19 @@ const relayAndSoundManager = require('../lib/relayAndSoundManager');
 
 const PORT = config.get('server.port') || 3001;
 const USE_HTTPS = !!process.env.HTTPS;
+
+// Initialize data files on startup - ensure all required files exist and are valid
+const initResult = dataPaths.initializeDataFiles();
+if (!initResult.success) {
+  logger.log('error', `Failed to initialize data files: ${initResult.errors.join(', ')}`);
+} else {
+  if (initResult.initialized.length > 0) {
+    logger.log('info', `Created missing data files: ${initResult.initialized.join(', ')}`);
+  }
+  if (initResult.repaired.length > 0) {
+    logger.log('warn', `Repaired corrupted data files: ${initResult.repaired.join(', ')}`);
+  }
+}
 
 const server = USE_HTTPS ? https.createServer({
   key: fs.readFileSync('certs/server.key'),
