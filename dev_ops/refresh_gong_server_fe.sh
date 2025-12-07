@@ -71,6 +71,17 @@ fi
 echo "Current FE commit: ${CURRENT_COMMIT}"
 echo "Cached FE commit:  ${CACHED_COMMIT:-none}"
 
+# Check if only .md files changed since last cached commit
+ONLY_MD_CHANGED=false
+if [ -n "${CACHED_COMMIT}" ] && [ "${CURRENT_COMMIT}" != "${CACHED_COMMIT}" ] && [ -d "${FE_DIST_CACHE}" ]; then
+  # Get list of changed files (non-.md files)
+  NON_MD_CHANGES=$(git diff --name-only "${CACHED_COMMIT}" "${CURRENT_COMMIT}" 2>/dev/null | grep -v '\.md$' || true)
+  if [ -z "${NON_MD_CHANGES}" ]; then
+    ONLY_MD_CHANGED=true
+    echo ">>> Only .md files changed since last build. Skipping build..."
+  fi
+fi
+
 if [ "${CURRENT_COMMIT}" = "${CACHED_COMMIT}" ] && [ -d "${FE_DIST_CACHE}" ]; then
   echo ">>> Frontend unchanged since last build. Skipping build-to-prod..."
   echo ">>> To force rebuild, delete: ${FE_CACHE_FILE}"
@@ -80,6 +91,18 @@ if [ "${CURRENT_COMMIT}" = "${CACHED_COMMIT}" ] && [ -d "${FE_DIST_CACHE}" ]; th
   rm -rf "${GONG_SERVER_DIST}"
   cp -r "${FE_DIST_CACHE}" "${GONG_SERVER_DIST}"
   echo ">>> Frontend restored from cache to: ${GONG_SERVER_DIST}"
+elif [ "${ONLY_MD_CHANGED}" = true ]; then
+  echo ">>> To force rebuild, delete: ${FE_CACHE_FILE}"
+  
+  # Copy cached dist to gong_server
+  echo ">>> Copying cached frontend dist to gong_server..."
+  rm -rf "${GONG_SERVER_DIST}"
+  cp -r "${FE_DIST_CACHE}" "${GONG_SERVER_DIST}"
+  echo ">>> Frontend restored from cache to: ${GONG_SERVER_DIST}"
+  
+  # Update commit cache to current (so next time we compare from here)
+  echo "${CURRENT_COMMIT}" > "${FE_CACHE_FILE}"
+  echo ">>> Commit cache updated (md-only change): ${FE_CACHE_FILE}"
 else
   echo ">>> Frontend has changes or cache missing. Running full build..."
   
