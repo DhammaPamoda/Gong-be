@@ -330,7 +330,7 @@ if [ "$NEED_RELOGIN" = true ]; then
   echo "  cd ~"
   echo "  ./docker_init.sh <USER> <USER_PASS> <IS_DOCKER>${BRANCH_HINT}"
 else
-  echo "You can now run docker_init.sh:"
+  echo "You can now run docker_init.sh, note that is_docker is set to false by default"
   echo "  cd ~"
   echo "  ./docker_init.sh <USER> <USER_PASS> <IS_DOCKER>${BRANCH_HINT}"
 fi
