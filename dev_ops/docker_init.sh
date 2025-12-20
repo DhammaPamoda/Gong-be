@@ -3,7 +3,7 @@ set -e
 
 USER=$1
 USER_PASS=$2
-IS_DOCKER=$3
+IS_DOCKER=${3:-false}
 GONG_BE_BRANCH=$4
 GONG_FE_BRANCH=$5
 
