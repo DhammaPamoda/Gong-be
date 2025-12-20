@@ -31,6 +31,11 @@ router.get('/isGongPlaying', (req, res) => {
   responder.send200Response(res, { isPlaying });
 });
 
+router.get('/diagnostics', (req, res) => {
+  const diagnostics = relayAndSoundManager.getDiagnostics();
+  responder.send200Response(res, diagnostics);
+});
+
 router.post('/toggleSwitch', (req, res) => {
   responseJson.relayNo = req.body.switch;
 
