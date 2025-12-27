@@ -78,15 +78,11 @@ XDG_DATA_HOME="${XDG_DATA_HOME:-/home/${USER}/.local/share}"
 GONG_DATA_DIR="${XDG_DATA_HOME}/gong"
 mkdir -p "${GONG_DATA_DIR}"
 
-# Initialize empty data files if they don't exist
-for file in coursesSchedule.json archivedCoursesSchedule.json manualGong.json obsoleteManualGong.json; do
-    if [ ! -f "${GONG_DATA_DIR}/${file}" ]; then
-        echo "[]" > "${GONG_DATA_DIR}/${file}"
-        echo "  Initialized: ${file}"
-    fi
-done
+# Note: Data files are initialized by the Node.js application (dataPaths.initializeDataFiles)
+# which creates them in the correct prod/ or dev/ subdirectory based on NODE_ENV.
+# Do NOT create files here - they would be in the wrong location.
 
-# Ensure proper ownership (files created by this script belong to the user)
+# Ensure proper ownership of the data directory
 chown -R "${USER}:${USER}" "${GONG_DATA_DIR}"
 echo "Gong data directory ready: ${GONG_DATA_DIR}"
 
