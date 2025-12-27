@@ -131,6 +131,63 @@ class FtdiDeviceWrapper extends EventEmitter {
   }
 
   /**
+   * Check if an error indicates the device was disconnected
+   * @param {Error} error - The error to check
+   * @returns {boolean} true if this appears to be a device disconnection error
+   */
+  isDeviceDisconnectedError(error) {
+    if (!error) return false;
+    const message = (error.message || '').toLowerCase();
+    // Common error patterns for USB device disconnection
+    return (
+      message.includes('device not found') ||
+      message.includes('no such device') ||
+      message.includes('device disconnected') ||
+      message.includes('usb') ||
+      message.includes('i/o error') ||
+      message.includes('ft_io_error') ||
+      message.includes('ft_device_not_found') ||
+      message.includes('ft_device_not_opened') ||
+      error.code === 'ENODEV' ||
+      error.code === 'EIO'
+    );
+  }
+
+  /**
+   * Invalidate the device handle (call when device is disconnected)
+   * This will trigger a re-find on the next operation
+   */
+  invalidateDevice() {
+    logger.relayAndSoundManager.warn('FTDI device handle invalidated - will re-find on next operation');
+    this.device = null;
+    this.emit('disconnected');
+  }
+
+  /**
+   * Check if the device is currently connected and usable
+   * @returns {Promise<boolean>} true if device is healthy
+   */
+  async checkHealth() {
+    if (!this.device) {
+      return false;
+    }
+    try {
+      // Try a simple operation to verify device is responsive
+      // Reading the modem status is a low-impact way to check device health
+      if (typeof this.device.getModemStatus === 'function') {
+        await this.device.getModemStatus();
+      }
+      return true;
+    } catch (error) {
+      logger.relayAndSoundManager.warn('FTDI device health check failed', { error: error?.message || error });
+      if (this.isDeviceDisconnectedError(error)) {
+        this.invalidateDevice();
+      }
+      return false;
+    }
+  }
+
+  /**
    * Write data to device (for relay control)
    * @param {number[]} dataArray - Array of bytes to write
    */
@@ -138,8 +195,16 @@ class FtdiDeviceWrapper extends EventEmitter {
     if (!this.device) {
       throw new Error('Device not open');
     }
-    const uint8Array = Uint8Array.from(dataArray);
-    await this.device.write(uint8Array);
+    try {
+      const uint8Array = Uint8Array.from(dataArray);
+      await this.device.write(uint8Array);
+    } catch (error) {
+      // Check if this is a device disconnection error
+      if (this.isDeviceDisconnectedError(error)) {
+        this.invalidateDevice();
+      }
+      throw error;
+    }
   }
 }
 

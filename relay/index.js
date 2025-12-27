@@ -140,7 +140,51 @@ const openDevice = (aRelaysModuleObject, aIsFirstTry = true) => {
   return retPromise;
 };
 
-const callBetweenOpenAndClose = (aRelaysModuleObject, aCallBackFunc) => {
+/**
+ * Check if an error indicates the device was disconnected and needs re-discovery
+ * @param {Error} error - The error to check
+ * @returns {boolean} true if this appears to be a device disconnection error
+ */
+const isDeviceDisconnectedError = (error) => {
+  if (!error) return false;
+  const message = (error.message || '').toLowerCase();
+  return (
+    message.includes('device not found') ||
+    message.includes('device not open') ||
+    message.includes('no such device') ||
+    message.includes('device disconnected') ||
+    message.includes('usb') ||
+    message.includes('i/o error') ||
+    message.includes('ft_io_error') ||
+    message.includes('ft_device_not_found') ||
+    message.includes('ft_device_not_opened') ||
+    error.code === 'ENODEV' ||
+    error.code === 'EIO'
+  );
+};
+
+/**
+ * Attempt to re-discover and open the device after a disconnection
+ * @param {RelaysModule} aRelaysModuleObject
+ * @returns {Promise<boolean>} true if device was successfully re-discovered
+ */
+const attemptDeviceRecovery = async (aRelaysModuleObject) => {
+  logger.relayAndSoundManager.info('Attempting FTDI device recovery after disconnection...');
+  
+  // Clear the old device handle
+  aRelaysModuleObject.FtdiDevice = null;
+  
+  try {
+    await findDevice(aRelaysModuleObject);
+    logger.relayAndSoundManager.info('FTDI device successfully re-discovered and opened');
+    return true;
+  } catch (error) {
+    logger.relayAndSoundManager.error('FTDI device recovery failed - device may be disconnected', { error });
+    return false;
+  }
+};
+
+const callBetweenOpenAndClose = (aRelaysModuleObject, aCallBackFunc, aIsRetry = false) => {
   const retPromise = new Promise((resolve, reject) => {
     openDevice(aRelaysModuleObject).then(() => {
       let error;
@@ -149,21 +193,47 @@ const callBetweenOpenAndClose = (aRelaysModuleObject, aCallBackFunc) => {
           error = err;
           logger.relayAndSoundManager.error('Failed to activate action on device', { error: err });
         })
-        .finally(() => {
+        .finally(async () => {
           // NOTE: We intentionally do NOT close the device after each operation.
           // Closing and reopening the FTDI device for every relay operation causes
           // race conditions when operations happen in quick succession (e.g., cancel
           // right after play). The USB/FTDI driver may not have fully released the
           // device before we try to reopen it, causing hangs.
           // The device will be closed when the process exits or on explicit cleanup.
+          
           if (error) {
+            // Check if this is a device disconnection error and attempt recovery
+            if (!aIsRetry && isDeviceDisconnectedError(error)) {
+              const recovered = await attemptDeviceRecovery(aRelaysModuleObject);
+              if (recovered) {
+                // Retry the operation once after recovery
+                logger.relayAndSoundManager.info('Retrying operation after device recovery...');
+                callBetweenOpenAndClose(aRelaysModuleObject, aCallBackFunc, true)
+                  .then(resolve)
+                  .catch(reject);
+                return;
+              }
+            }
             reject(error);
           } else {
             resolve(true);
           }
         });
-    }).catch((error) => {
+    }).catch(async (error) => {
       logger.relayAndSoundManager.error('Failed to open device', { error });
+      
+      // If open failed due to disconnection and this is not already a retry, attempt recovery
+      if (!aIsRetry && isDeviceDisconnectedError(error)) {
+        const recovered = await attemptDeviceRecovery(aRelaysModuleObject);
+        if (recovered) {
+          // Retry the operation once after recovery
+          logger.relayAndSoundManager.info('Retrying operation after device recovery...');
+          callBetweenOpenAndClose(aRelaysModuleObject, aCallBackFunc, true)
+            .then(resolve)
+            .catch(reject);
+          return;
+        }
+      }
       reject(error);
     });
   });
@@ -276,6 +346,70 @@ class RelaysModule {
     const setRelayCommand = `${NO_OF_PORTS} all ${newCurrentStatus}`;
     const run = runCommandInQueue(this, setRelayCommand);
     return run;
+  }
+
+  /**
+   * Check if the FTDI device is connected and healthy
+   * Should be called before scheduled gongs to ensure device is ready
+   * @returns {Promise<{connected: boolean, recovered: boolean, error: string|null}>}
+   */
+  async checkDeviceHealth() {
+    const result = { connected: false, recovered: false, error: null };
+    
+    if (!ftdi) {
+      result.error = 'FTDI module not available';
+      return result;
+    }
+
+    // Check if we have a device handle
+    if (!this.FtdiDevice) {
+      logger.relayAndSoundManager.warn('RelaysModule::checkDeviceHealth - No device handle, attempting to find device...');
+      try {
+        await findDevice(this);
+        result.connected = true;
+        result.recovered = true;
+        logger.relayAndSoundManager.info('RelaysModule::checkDeviceHealth - Device found and connected');
+      } catch (error) {
+        result.error = error.message || 'Failed to find device';
+        logger.relayAndSoundManager.error('RelaysModule::checkDeviceHealth - Failed to find device', { error });
+      }
+      return result;
+    }
+
+    // We have a device handle, verify it's still working
+    try {
+      if (typeof this.FtdiDevice.checkHealth === 'function') {
+        const healthy = await this.FtdiDevice.checkHealth();
+        if (healthy) {
+          result.connected = true;
+          return result;
+        }
+      } else {
+        // No health check method, assume device is connected if handle exists
+        result.connected = true;
+        return result;
+      }
+    } catch (error) {
+      logger.relayAndSoundManager.warn('RelaysModule::checkDeviceHealth - Health check failed', { error: error?.message || error });
+    }
+
+    // Device handle exists but is not healthy, attempt recovery
+    logger.relayAndSoundManager.info('RelaysModule::checkDeviceHealth - Device unhealthy, attempting recovery...');
+    const recovered = await attemptDeviceRecovery(this);
+    result.connected = recovered;
+    result.recovered = recovered;
+    if (!recovered) {
+      result.error = 'Device recovery failed - device may be disconnected';
+    }
+    return result;
+  }
+
+  /**
+   * Check if the FTDI module is available
+   * @returns {boolean}
+   */
+  isModuleAvailable() {
+    return !!ftdi;
   }
 }
 
