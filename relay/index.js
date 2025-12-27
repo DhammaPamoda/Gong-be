@@ -150,24 +150,17 @@ const callBetweenOpenAndClose = (aRelaysModuleObject, aCallBackFunc) => {
           logger.relayAndSoundManager.error('Failed to activate action on device', { error: err });
         })
         .finally(() => {
-          if (!ftdi) {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(true);
-            }
-            return;
+          // NOTE: We intentionally do NOT close the device after each operation.
+          // Closing and reopening the FTDI device for every relay operation causes
+          // race conditions when operations happen in quick succession (e.g., cancel
+          // right after play). The USB/FTDI driver may not have fully released the
+          // device before we try to reopen it, causing hangs.
+          // The device will be closed when the process exits or on explicit cleanup.
+          if (error) {
+            reject(error);
+          } else {
+            resolve(true);
           }
-          ftdi.closeDevice(aRelaysModuleObject.FtdiDevice).then(() => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(true);
-            }
-          }).catch((err) => {
-            logger.relayAndSoundManager.error('Failed to close device', { error: err });
-            reject(err);
-          });
         });
     }).catch((error) => {
       logger.relayAndSoundManager.error('Failed to open device', { error });
