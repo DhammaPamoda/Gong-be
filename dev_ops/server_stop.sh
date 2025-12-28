@@ -4,6 +4,9 @@ USER=$1
 USER_PASS=$2
 IS_DOCKER=${3:-false}
 
+# Port used by gong_server (from config/production.json)
+GONG_PORT=3000
+
 set +v
 
 echo -e "╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦"
@@ -19,6 +22,47 @@ if [ "${IS_DOCKER}" != "true" ]; then
 else
   sudo -S pm2-runtime stop gong_server <<< "${USER_PASS}"
 fi
+
+set +v
+echo -e "----------------------------------------------------------------------------------------------------"
+echo "Waiting for graceful shutdown (max 12 seconds)..."
+
+# Wait for pm2 process to fully terminate (up to 12 seconds)
+for i in {1..12}; do
+  if ! sudo -S pm2 pid gong_server <<< "${USER_PASS}" 2>/dev/null | grep -q '[0-9]'; then
+    echo "PM2 process terminated after ${i} seconds"
+    break
+  fi
+  sleep 1
+done
+
+# Force kill any process still holding the port
+echo "Checking for processes holding port ${GONG_PORT}..."
+PORT_PIDS=$(sudo -S lsof -ti :${GONG_PORT} <<< "${USER_PASS}" 2>/dev/null)
+if [ -n "$PORT_PIDS" ]; then
+  echo "⚠️  Found processes holding port ${GONG_PORT}: $PORT_PIDS"
+  echo "Sending SIGTERM..."
+  echo "$PORT_PIDS" | xargs -r sudo -S kill <<< "${USER_PASS}" 2>/dev/null || true
+  sleep 2
+  
+  # Check again and force kill if still running
+  PORT_PIDS=$(sudo -S lsof -ti :${GONG_PORT} <<< "${USER_PASS}" 2>/dev/null)
+  if [ -n "$PORT_PIDS" ]; then
+    echo "⚠️  Processes still holding port, sending SIGKILL..."
+    echo "$PORT_PIDS" | xargs -r sudo -S kill -9 <<< "${USER_PASS}" 2>/dev/null || true
+    sleep 1
+  fi
+fi
+
+# Final verification
+PORT_PIDS=$(sudo -S lsof -ti :${GONG_PORT} <<< "${USER_PASS}" 2>/dev/null)
+if [ -n "$PORT_PIDS" ]; then
+  echo "❌ ERROR: Port ${GONG_PORT} still occupied by: $PORT_PIDS"
+else
+  echo "✅ Port ${GONG_PORT} is now free"
+fi
+
+set -v
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"

@@ -33,6 +33,16 @@ const server = USE_HTTPS ? https.createServer({
   cert: fs.readFileSync('certs/server.pem'),
 }, app) : http.createServer(app);
 
+// Track active connections for graceful shutdown
+const activeConnections = new Set();
+
+server.on('connection', (conn) => {
+  activeConnections.add(conn);
+  conn.on('close', () => {
+    activeConnections.delete(conn);
+  });
+});
+
 server.listen(PORT, () => {
   exec('whoami', (err, stdout, stderr) => {
     logger.log('info', '\n');
@@ -76,6 +86,7 @@ const gracefulShutdown = (signal) => {
   isShuttingDown = true;
   
   logger.log('info', `Received ${signal}. Starting graceful shutdown...`);
+  logger.log('info', `Active connections: ${activeConnections.size}`);
   
   // Close the HTTP server first (stops accepting new connections)
   server.close(() => {
@@ -92,6 +103,16 @@ const gracefulShutdown = (signal) => {
     logger.log('info', 'Graceful shutdown complete. Exiting.');
     process.exit(0);
   });
+  
+  // Destroy remaining connections after 3 seconds to speed up shutdown
+  setTimeout(() => {
+    if (activeConnections.size > 0) {
+      logger.log('info', `Destroying ${activeConnections.size} remaining connections...`);
+      for (const conn of activeConnections) {
+        conn.destroy();
+      }
+    }
+  }, 3000);
   
   // Force exit after 10 seconds if graceful shutdown takes too long
   setTimeout(() => {
