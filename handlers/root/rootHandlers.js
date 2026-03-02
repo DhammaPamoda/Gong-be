@@ -4,6 +4,8 @@ const responder = require('../../lib/responder');
 
 const authenticateFunc = require('../../auth/authenticate');
 const scheduleManager = require('../../lib/scheduleManager');
+const relayAndSoundManager = require('../../lib/relayAndSoundManager');
+const Gong = require('../../model/gong');
 
 
 const authenticate = async (req, res, next) => {
@@ -47,8 +49,10 @@ const handleHK4Key = (req, res, next) => {
     return;
   }
 
-  // TODO: Implement specific actions for each key as requested later
-  console.log(`[HARDWARE] HK4 Keyboard Key Pressed: ${key}`);
+  if (key === '1') {
+    const gongToPlay = new Gong(2, [0]);
+    relayAndSoundManager.playImmediateGong(gongToPlay);
+  }
 
   responder.send200Response(res, { success: true, key });
 };
