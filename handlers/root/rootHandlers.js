@@ -32,8 +32,30 @@ const getNextGong = (req, res, next) => {
   responder.send200Response(res, retObject);
 };
 
+const handleHK4Key = (req, res, next) => {
+  const { key } = req.body;
+  const remoteAddress = req.socket.remoteAddress;
+
+  // Security check: only allow requests from localhost
+  if (remoteAddress !== '127.0.0.1' && remoteAddress !== '::1' && remoteAddress !== '::ffff:127.0.0.1') {
+    responder.sendErrorResponse(res, 403, 'Forbidden: Hardware events only allowed from localhost');
+    return;
+  }
+
+  if (!['1', '2', '3', '4'].includes(key)) {
+    responder.sendErrorResponse(res, 400, 'Invalid key');
+    return;
+  }
+
+  // TODO: Implement specific actions for each key as requested later
+  console.log(`[HARDWARE] HK4 Keyboard Key Pressed: ${key}`);
+
+  responder.send200Response(res, { success: true, key });
+};
+
 
 module.exports = {
   authenticate,
   getNextGong,
+  handleHK4Key,
 };

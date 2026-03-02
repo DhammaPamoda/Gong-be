@@ -86,6 +86,11 @@ mkdir -p "${GONG_DATA_DIR}"
 chown -R "${USER}:${USER}" "${GONG_DATA_DIR}"
 echo "Gong data directory ready: ${GONG_DATA_DIR}"
 
+# HW Support: Add user to input group to allow reading USB events
+echo "Configuring hardware access for USB HK4 Keyboard..."
+sudo -S usermod -a -G input "${USER}" <<< "${USER_PASS}"
+echo "User ${USER} added to 'input' group. NOTE: A logout or reboot may be required for hardware permissions to take effect."
+
 # Building the BE and FE
 "${DEV_OPS_FILES_DIR}"/refresh_gong_server_be.sh "${USER}" "${USER_PASS}" "${GONG_BE_BRANCH}"
 "${DEV_OPS_FILES_DIR}"/refresh_gong_server_fe.sh "${USER}" "${USER_PASS}" "${GONG_FE_BRANCH}"

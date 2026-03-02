@@ -8,6 +8,7 @@ const rootDataHandlers = require('../handlers/root/rootHandlers');
 
 const authorizeFunc = require('../auth/authorize');
 
+router.post('/hardware/hk4', rootDataHandlers.handleHK4Key);
 
 router.use(authorizeFunc());
 router.use('/users', users);

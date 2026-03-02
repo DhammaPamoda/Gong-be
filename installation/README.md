@@ -259,3 +259,22 @@ node --version  # Should show v18.x.x
 sudo npm install -g pm2
 ```
 
+## Hardware Support: HK4 USB Keyboard
+
+The Gong Server supports an HK4 USB keyboard handle (4 buttons) for hardware actions. 
+
+### Prerequisites
+- HK4 USB Keyboard connected to the machine.
+- User must be in the `input` group to access `/dev/input/` events.
+
+### How it Works
+A separate background service `hk4_listener` (managed by PM2) listens for raw input events. When a button (1, 2, 3, or 4) is pressed, it sends a local POST request to the main `gong_server` API.
+
+### Troubleshooting Hardware Access
+If the listener cannot access the device:
+1. Ensure the user is in the `input` group: `sudo usermod -a -G input $USER`
+2. **Log out and log back in** (or reboot) for group changes to take effect.
+3. Check the listener logs: `pm2 logs hk4_listener`
+
+The listener identifies the device by looking for `*HK4*event-kbd` in `/dev/input/by-id/`.
+
