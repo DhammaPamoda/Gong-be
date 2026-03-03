@@ -5,7 +5,8 @@ const path = require('path');
 
 // Configuration
 const DEVICE_NAME_PATTERN = /PCsensor_Handle_Keyboard/i; // Pattern to identify the PCsensor keyboard
-const BACKEND_URL = 'http://127.0.0.1:3001/api/hardware/hk4';
+const GONG_SERVER_PORT = process.env.GONG_SERVER_PORT || 3000;
+const BACKEND_URL = `http://127.0.0.1:${GONG_SERVER_PORT}/api/hardware/hk4`;
 
 /**
  * Finds the PCsensor device in /dev/input/by-id/
@@ -38,7 +39,7 @@ function sendKeyEvent(key) {
     const data = JSON.stringify({ key });
     const options = {
         hostname: '127.0.0.1',
-        port: 3001,
+        port: GONG_SERVER_PORT,
         path: '/api/hardware/hk4',
         method: 'POST',
         headers: {

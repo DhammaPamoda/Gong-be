@@ -30,7 +30,8 @@ module.exports = {
       restart_delay: 10000,
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
+        GONG_SERVER_PORT: '3000'
       }
     }
   ]
