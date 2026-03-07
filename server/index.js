@@ -11,6 +11,7 @@ const dataPaths = require('../lib/config/dataPaths');
 const scheduleManager = require('../lib/scheduleManager');
 const gongsManager = require('../lib/gongsManager');
 const relayAndSoundManager = require('../lib/relayAndSoundManager');
+const oref = require('../lib/oref');
 
 const PORT = config.get('server.port') || 3001;
 const USE_HTTPS = !!process.env.HTTPS;
@@ -65,6 +66,7 @@ scheduleManager.setExecutor(relayAndSoundManager.playGongForJob);
 
 gongsManager.addOnGongActionListener(scheduleManager.jobActionFunction.bind(scheduleManager));
 gongsManager.init();
+oref.init();
 
 // ==========================================
 // Startup Logging
@@ -84,26 +86,26 @@ const gracefulShutdown = (signal) => {
     return;
   }
   isShuttingDown = true;
-  
+
   logger.log('info', `Received ${signal}. Starting graceful shutdown...`);
   logger.log('info', `Active connections: ${activeConnections.size}`);
-  
+
   // Close the HTTP server first (stops accepting new connections)
   server.close(() => {
     logger.log('info', 'HTTP server closed');
-    
+
     // Stop the schedule manager
     scheduleManager.stop();
     logger.log('info', 'Schedule manager stopped');
-    
+
     // Cleanup audio processes
     relayAndSoundManager.forceCleanup();
     logger.log('info', 'Relay and sound manager cleaned up');
-    
+
     logger.log('info', 'Graceful shutdown complete. Exiting.');
     process.exit(0);
   });
-  
+
   // Destroy remaining connections after 3 seconds to speed up shutdown
   setTimeout(() => {
     if (activeConnections.size > 0) {
@@ -113,7 +115,7 @@ const gracefulShutdown = (signal) => {
       }
     }
   }, 3000);
-  
+
   // Force exit after 10 seconds if graceful shutdown takes too long
   setTimeout(() => {
     logger.log('error', 'Graceful shutdown timed out after 10 seconds. Force exiting.');

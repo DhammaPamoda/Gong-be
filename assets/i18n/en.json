@@ -378,6 +378,9 @@
             "buttons": {
                 "save": "Save"
             }
+        },
+        "systemSettings": {
+            "label": "Security Checks"
         }
     }
 }
