@@ -12,8 +12,9 @@ set -v
 USER=$1
 USER_PASS=$2
 GONG_BE_BRANCH=$3
+BASE_DIR=${4:-/home/${USER}/projects}
 
-cd "/home/${USER}/projects/Gong-be"
+cd "${BASE_DIR}/Gong-be"
 rm -rf node_modules
 
 set +v
@@ -40,7 +41,7 @@ set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 # Check and install FTDI D2XX headers if missing (needed for optional dependency ft245rl)
-ORIGINAL_DIR="/home/${USER}/projects/Gong-be"
+ORIGINAL_DIR="${BASE_DIR}/Gong-be"
 if [ ! -f "/usr/local/include/ftd2xx.h" ]; then
   echo "FTDI D2XX headers not found. Attempting to install..."
   set -v
@@ -193,7 +194,7 @@ set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 # Ensure data files exist in deployed gong_server (copy from templates if missing)
-GONG_SERVER_DATA="/home/${USER}/projects/gong_server/assets/data"
+GONG_SERVER_DATA="${BASE_DIR}/Gong-be/assets/data"
 if [ ! -f "${GONG_SERVER_DATA}/coursesSchedule.json" ] && [ -f "${GONG_SERVER_DATA}/coursesSchedule.example.json" ]; then
     echo "Initializing coursesSchedule.json from template in gong_server..."
     sudo -S cp "${GONG_SERVER_DATA}/coursesSchedule.example.json" "${GONG_SERVER_DATA}/coursesSchedule.json" <<< "${USER_PASS}"
