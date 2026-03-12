@@ -1,10 +1,10 @@
 const moment = require('moment');
 
-export const EMERGENCY_ACTIVE = 1;
-export const EMERGENCY_END = 13;
-export const EMERGENCY_PREPARE = 14;
+const EMERGENCY_ACTIVE = 1;
+const EMERGENCY_END = 13;
+const EMERGENCY_PREPARE = 14;
 
-export const supportedAlertCategories = [
+const supportedAlertCategories = [
     EMERGENCY_ACTIVE,
     EMERGENCY_END,
     EMERGENCY_PREPARE
@@ -30,7 +30,7 @@ const canRunAlarmWithinBufferTime = (newAlertCategoryNumber, currentAlertCategor
     return true;
 }
 
-export const runSecurityAlarm = (newAlertCategoryNumber, currentAlertCategoryNumber, newAlertTime, currentAlertTime) => {
+const runSecurityAlarm = (newAlertCategoryNumber, currentAlertCategoryNumber, newAlertTime, currentAlertTime) => {
     if (newAlertTimeWithinBefferTime(newAlertTime, currentAlertTime)
         && !canRunAlarmWithinBufferTime(newAlertCategoryNumber, currentAlertCategoryNumber)
     ) {
@@ -38,3 +38,11 @@ export const runSecurityAlarm = (newAlertCategoryNumber, currentAlertCategoryNum
     }
     return true;
 }
+
+module.exports = {
+    EMERGENCY_ACTIVE,
+    EMERGENCY_END,
+    EMERGENCY_PREPARE,
+    supportedAlertCategories,
+    runSecurityAlarm
+};
