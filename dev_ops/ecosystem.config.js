@@ -1,7 +1,7 @@
 const path = require('path');
 // Use regular user - do NOT run pm2 with sudo to avoid creating a separate root PM2 daemon
-// Resolve relative to this file: ${BASE_DIR}/gong_dev_ops/dev_ops/ -> ../../Gong-be = ${BASE_DIR}/Gong-be
-const gongServerDir = path.resolve(__dirname, '../../Gong-be');
+// Resolve relative to this file: ${BASE_DIR}/gong_dev_ops/dev_ops/ -> ../../gong_server = ${BASE_DIR}/gong_server
+const gongServerDir = path.resolve(__dirname, '../../gong_server');
 
 module.exports = {
   apps: [

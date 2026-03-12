@@ -12,6 +12,7 @@ set -v
 USER=$1
 USER_PASS=$2
 GONG_FE_BRANCH=$3
+BASE_DIR=${4:-/home/${USER}/projects}
 
 # ==========================================
 # Cache Configuration
@@ -19,7 +20,7 @@ GONG_FE_BRANCH=$3
 CACHE_DIR="/home/${USER}/.cache/gong"
 FE_CACHE_FILE="${CACHE_DIR}/fe_last_build_commit"
 FE_DIST_CACHE="${CACHE_DIR}/fe_dist"
-GONG_SERVER_DIST="/home/${USER}/projects/gong_server/dist"
+GONG_SERVER_DIST="${BASE_DIR}/gong_server/dist"
 mkdir -p "${CACHE_DIR}"
 
 # Detect npm and node paths (needed for sudo commands which reset PATH)
@@ -34,7 +35,7 @@ if [[ "$NPM_PATH" == "npm" ]] && [ -s "$HOME/.nvm/nvm.sh" ]; then
   NODE_PATH=$(command -v node || which node || echo "node")
 fi
 
-cd "/home/${USER}/projects/Gong_fe"
+cd "${BASE_DIR}/Gong_fe"
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
