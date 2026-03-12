@@ -1,0 +1,13 @@
+{
+    "enabled": true,
+    "sequences": {
+        "1111": {
+            "gongType": 2,
+            "areas": [
+                0
+            ],
+            "volume": 100,
+            "repeat": 1
+        }
+    }
+}

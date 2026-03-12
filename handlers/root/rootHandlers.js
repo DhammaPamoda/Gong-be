@@ -5,6 +5,7 @@ const responder = require('../../lib/responder');
 const authenticateFunc = require('../../auth/authenticate');
 const scheduleManager = require('../../lib/scheduleManager');
 const relayAndSoundManager = require('../../lib/relayAndSoundManager');
+const dataPaths = require('../../lib/config/dataPaths');
 const Gong = require('../../model/gong');
 
 
@@ -34,6 +35,12 @@ const getNextGong = (req, res, next) => {
   responder.send200Response(res, retObject);
 };
 
+// Rolling buffer for HK4 key sequences (max 4 keys)
+const hk4KeyBuffer = [];
+let hk4BufferClearTimer = null;
+const HK4_SEQUENCE_LENGTH = 4;
+const HK4_SEQUENCE_TIMEOUT_MS = 5000;
+
 const handleHK4Key = (req, res, next) => {
   const { key } = req.body;
   const remoteAddress = req.socket.remoteAddress;
@@ -48,10 +55,29 @@ const handleHK4Key = (req, res, next) => {
     responder.sendErrorResponse(res, 400, 'Invalid key');
     return;
   }
+  const config = JSON.parse(fs.readFileSync(dataPaths.getDataFilePath('hk4KeyMap.json')));
+  if (!config.enabled) {
+    responder.send200Response(res, { success: true, key });
+    return;
+  }
 
-  if (key === '1') {
-    const gongToPlay = new Gong(2, [0]);
-    relayAndSoundManager.playImmediateGong(gongToPlay);
+  // Reset the inactivity timer on each key press
+  if (hk4BufferClearTimer) clearTimeout(hk4BufferClearTimer);
+  hk4BufferClearTimer = setTimeout(() => {
+    hk4KeyBuffer.length = 0;
+  }, HK4_SEQUENCE_TIMEOUT_MS);
+
+  // Maintain rolling buffer of the last 4 keys
+  hk4KeyBuffer.push(key);
+  if (hk4KeyBuffer.length > HK4_SEQUENCE_LENGTH) hk4KeyBuffer.shift();
+
+  if (hk4KeyBuffer.length === HK4_SEQUENCE_LENGTH) {
+    const sequence = hk4KeyBuffer.join('');
+    const gongConfig = config.sequences[sequence];
+    if (gongConfig) {
+      const gongToPlay = new Gong(gongConfig.gongType, gongConfig.areas, gongConfig.volume, gongConfig.repeat);
+      relayAndSoundManager.playImmediateGong(gongToPlay);
+    }
   }
 
   responder.send200Response(res, { success: true, key });
