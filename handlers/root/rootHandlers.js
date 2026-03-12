@@ -22,7 +22,7 @@ const authenticate = async (req, res, next) => {
 };
 
 const getNextGong = (req, res, next) => {
-  const rawData = fs.readFileSync('assets/data/staticData.json');
+  const rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
   const { lastUpdatedTime } = JSON.parse(rawData.toString());
 
   const nextScheduledJob = scheduleManager.getNextScheduledJob();
