@@ -80,6 +80,21 @@
             "id": 2,
             "name": "gong-single1",
             "pathName": "gong-single1.mp3"
+        },
+        {
+            "id": 111,
+            "name": "siren",
+            "pathName": "siren.mp3"
+        },
+        {
+            "id": 112,
+            "name": "end",
+            "pathName": "emergency-event-end.mp3"
+        },
+        {
+            "id": 113,
+            "name": "prepare",
+            "pathName": "prepare-for-alarm.mp3"
         }
     ],
     "permissions": [
