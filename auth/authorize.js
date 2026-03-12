@@ -49,6 +49,8 @@ function authorize(roles = []) {
           '/api/relay/cancelGong',
           '/api/relay/playGong',
           '/api/relay/diagnostics',
+          '/data/staticData',
+          '/api/data/staticData',
           '/loginPage',
           '/mainPage',
           '/favicon.ico',

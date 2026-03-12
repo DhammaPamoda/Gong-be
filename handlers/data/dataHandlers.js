@@ -12,12 +12,12 @@ const dataPaths = require('../../lib/config/dataPaths');
 const NO_OF_PORTS = process.env.NO_OF_PORTS ? Number.parseInt(process.env.NO_OF_PORTS, 10) : 4;
 
 function getStaticData(req, res, next) {
-  let rawData = fs.readFileSync('assets/data/staticData.json');
+  let rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
   const staticData = JSON.parse(rawData.toString());
 
   staticData.areas = staticData.areas.filter((value, index) => index <= NO_OF_PORTS);
 
-  fs.readdir('assets/i18n', (error, files) => {
+  fs.readdir(dataPaths.I18N_ASSETS_DIR, (error, files) => {
     if (error) {
       const newErr = new Error('Failed to read language directory');
       responder.sendErrorResponse(res, 500, 'Error in uploadCourses ', newErr, req);
@@ -26,7 +26,7 @@ function getStaticData(req, res, next) {
     try {
       const languageObj = [];
       files.forEach((file) => {
-        rawData = fs.readFileSync(`assets/i18n/${file}`);
+        rawData = fs.readFileSync(dataPaths.getI18nPath(file));
         const lastDotIndex = file.lastIndexOf('.');
         const language = file.substr(lastDotIndex - 2, 2);
         languageObj.push({
@@ -53,7 +53,7 @@ function getCoursesSchedule(req, res, next) {
 
 function getCourseByName(req, res, next) {
   const courseName = req.params.name;
-  const rawData = fs.readFileSync(`assets/data/course_${courseName}.json`);
+  const rawData = fs.readFileSync(dataPaths.getStaticAssetPath(`course_${courseName}.json`));
   const foundCourse = JSON.parse(rawData);
   responder.send200Response(res, foundCourse);
 }
