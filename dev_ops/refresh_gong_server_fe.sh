@@ -110,31 +110,16 @@ else
   set -v
   rm -rf node_modules
   npm i
-
-  set +v
-  echo -e "----------------------------------------------------------------------------------------------------"
-
-  set -v
-  echo "Node version: $(${NODE_PATH} -v)"
-  # Use full path to npm with sudo (sudo resets PATH, so we need absolute path)
-  # Ensure node bin directory is in PATH for npm to find node
-  if [[ "$NPM_PATH" != "npm" ]] && [ -f "$NPM_PATH" ]; then
-    # Extract directory containing npm and ensure it's in PATH
-    NPM_DIR=$(dirname "${NPM_PATH}")
-    # Use absolute path to npm and ensure node is in PATH
-    sudo -S env "PATH=${NPM_DIR}:$PATH" "${NPM_PATH}" run build-to-prod <<< "${USER_PASS}"
-  else
-    # Fallback: preserve PATH and hope npm is in system PATH
-    sudo -S env "PATH=$PATH" npm run build-to-prod <<< "${USER_PASS}"
-  fi
+  # Run npm build as the current user (no sudo)
+  # This ensures build artifacts are owned by the current user
+  npm run build-to-prod
   
   # Cache the built dist from gong_server (build-to-prod outputs directly there)
   # Note: Build runs with sudo, so files are root-owned. Use sudo for copy operations.
   if [ -d "${GONG_SERVER_DIST}" ]; then
     echo ">>> Caching frontend dist..."
-    sudo -S rm -rf "${FE_DIST_CACHE}" <<< "${USER_PASS}"
-    sudo -S cp -r "${GONG_SERVER_DIST}" "${FE_DIST_CACHE}" <<< "${USER_PASS}"
-    sudo -S chown -R "${USER}:${USER}" "${FE_DIST_CACHE}" <<< "${USER_PASS}"
+    rm -rf "${FE_DIST_CACHE}"
+    cp -r "${GONG_SERVER_DIST}" "${FE_DIST_CACHE}"
     echo ">>> Frontend cached to: ${FE_DIST_CACHE}"
     echo ">>> Frontend deployed to: ${GONG_SERVER_DIST}"
   else

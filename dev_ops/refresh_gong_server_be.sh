@@ -134,7 +134,7 @@ set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 set -v
-# Run npm install, but continue even if optional dependencies fail
+# Run npm install as the current user
 npm i || {
   echo "Warning: npm install encountered errors (likely from optional dependencies). Continuing..."
   # Check if critical dependencies were installed
@@ -179,16 +179,9 @@ set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
 set -v
-export HISTIGNORE='*sudo -S*'
-
-# Detect npm path (needed for sudo which resets PATH)
-NPM_PATH=$(command -v npm || which npm 2>/dev/null || echo "npm")
-if [[ "$NPM_PATH" != "npm" ]] && [ -f "$NPM_PATH" ]; then
-  NPM_DIR=$(dirname "${NPM_PATH}")
-  sudo -S env "PATH=${NPM_DIR}:$PATH" "${NPM_PATH}" run build <<< "${USER_PASS}"
-else
-  sudo -S env "PATH=$PATH" npm run build <<< "${USER_PASS}"
-fi
+# Run npm build as the current user (no sudo)
+# This ensures build artifacts are owned by the current user
+npm run build
 
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
@@ -197,8 +190,13 @@ echo -e "-----------------------------------------------------------------------
 GONG_SERVER_DATA="${BASE_DIR}/Gong-be/assets/data"
 if [ ! -f "${GONG_SERVER_DATA}/coursesSchedule.json" ] && [ -f "${GONG_SERVER_DATA}/coursesSchedule.example.json" ]; then
     echo "Initializing coursesSchedule.json from template in gong_server..."
-    sudo -S cp "${GONG_SERVER_DATA}/coursesSchedule.example.json" "${GONG_SERVER_DATA}/coursesSchedule.json" <<< "${USER_PASS}"
+    cp "${GONG_SERVER_DATA}/coursesSchedule.example.json" "${GONG_SERVER_DATA}/coursesSchedule.json"
 fi
+
+# Ensure all files in gong_server are owned by the current user
+# (Just in case any were previously created by root)
+echo "Ensuring correct ownership of ${BASE_DIR}/gong_server..."
+sudo -S chown -R "${USER}:${USER}" "${BASE_DIR}/gong_server" <<< "${USER_PASS}"
 
 echo
 echo

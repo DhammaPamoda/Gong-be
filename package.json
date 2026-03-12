@@ -8,7 +8,7 @@
     "start": "NO_OF_PORTS=8 NODE_ENV=development babel-node server",
     "prestart-https": "./dev_ops/prestart_init.sh",
     "start-https": "NO_OF_PORTS=8 NODE_ENV=development HTTPS=true babel-node server",
-    "clean": "find ../gong_server/** | grep -v '/dist' | xargs rm -rf && mkdir -p ../gong_server",
+    "clean": "rm -rf ../gong_server/server ../gong_server/lib ../gong_server/routes ../gong_server/handlers ../gong_server/auth && mkdir -p ../gong_server",
     "copy-modules": "cp -rf node_modules ../gong_server",
     "copy-dist-to-dev": "cp -rf ../gong_server/dist .",
     "copy-assets": "cp -rf assets ../gong_server",
