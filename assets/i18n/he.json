@@ -9,7 +9,10 @@
                 "gong-single1": "צלצול יחיד",
                 "single": "צלצול יחיד",
                 "chanting": "שיר",
-                "bells": "פעמונים"
+                "bells": "פעמונים",
+                "siren": "סירנה",
+                "prepare": "אזעקת בטיחות",
+                "end": "סיום האירוע"
             },
             "areas": {
                 "values": {

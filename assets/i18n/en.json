@@ -9,7 +9,10 @@
                 "gong-single1": "Single1",
                 "single": "Single",
                 "chanting": "Chanting",
-                "bells": "Bells"
+                "bells": "Bells",
+                "siren": "Siren",
+                "prepare": "Security Alert",
+                "end": "Event End"
             },
             "areas": {
                 "all": "All",
