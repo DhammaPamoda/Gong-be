@@ -97,7 +97,7 @@ init_data_file "obsoleteManualGong.json" "[]"
 echo "Gong data directory ready: ${GONG_DATA_DIR}"
 
 CACHE_DIR="${HOME}/.cache/ftdi-d2xx"
-CACHED_BINARY="${CACHE_DIR}/ftdi-d2xx.Linux.x86_64.node"
+CACHED_BINARY="${CACHE_DIR}/ftdi-d2xx_1.2.0.Linux.x86_64.node"
 TARGET_DIR="${GONG_BE_DIR}/node_modules/ftdi-d2xx/build/Release"
 TARGET_BINARY="${TARGET_DIR}/ftdi-d2xx.Linux.x86_64.node"
 

@@ -7,7 +7,7 @@ GONG_BE_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 DOCKER_IMAGE="ftdi-d2xx-builder"
 CONTAINER_NAME="ftdi-d2xx-build-$(date +%s)"
 CACHE_DIR="${HOME}/.cache/ftdi-d2xx"
-CACHED_BINARY="${CACHE_DIR}/ftdi-d2xx.Linux.x86_64.node"
+CACHED_BINARY="${CACHE_DIR}/ftdi-d2xx_1.2.0.Linux.x86_64.node"
 TARGET_DIR="${GONG_BE_DIR}/node_modules/ftdi-d2xx/build/Release"
 TARGET_BINARY="${TARGET_DIR}/ftdi-d2xx.Linux.x86_64.node"
 
@@ -63,7 +63,7 @@ ${DOCKER_CMD} build -f Dockerfile.ftdi-build -t ${DOCKER_IMAGE} .
 cd "${GONG_BE_DIR}"
 if [ ! -d "node_modules/ftdi-d2xx" ]; then
     echo "Installing ftdi-d2xx package..."
-    npm install ftdi-d2xx
+    npm install --no-save ftdi-d2xx@1.2.0
 fi
 
 # Create build directory if it doesn't exist
