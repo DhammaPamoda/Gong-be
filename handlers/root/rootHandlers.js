@@ -7,6 +7,7 @@ const scheduleManager = require('../../lib/scheduleManager');
 const relayAndSoundManager = require('../../lib/relayAndSoundManager');
 const dataPaths = require('../../lib/config/dataPaths');
 const Gong = require('../../model/gong');
+const hk4Manager = require('../../lib/hk4Manager');
 
 
 const authenticate = async (req, res, next) => {
@@ -55,7 +56,7 @@ const handleHK4Key = (req, res, next) => {
     responder.sendErrorResponse(res, 400, 'Invalid key');
     return;
   }
-  const config = JSON.parse(fs.readFileSync(dataPaths.getDataFilePath('hk4KeyMap.json')));
+  const config = hk4Manager.getSettings();
   if (!config.enabled) {
     responder.send200Response(res, { success: true, key });
     return;
