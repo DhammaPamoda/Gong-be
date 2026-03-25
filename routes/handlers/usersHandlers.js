@@ -10,7 +10,7 @@ function getUsers(req, res, next) {
 }
 
 function getUsersId(req, res, next) {
-  const id = req.params.id;
+  const { id } = req.params;
   responder.send200Response(res, users.filter(user => user.id === id)[0]);
 }
 

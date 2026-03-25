@@ -16,15 +16,19 @@ const responseJson = {
 router.post('/playGong', (req, res) => {
   relayAndSoundManager.playImmediateGong(req.body)
     .then(() => responder.send200Response(res, { gongSuccessPlay: true }))
-    .catch((err) => responder.sendErrorResponse(res,
-      err.httpStatusCode || 500, 'Failed to play gong ', err));
+    .catch((err) => responder.sendErrorResponse(
+      res,
+      err.httpStatusCode || 500,
+      'Failed to play gong ',
+      err,
+    ));
 });
 
 router.post('/cancelGong', (req, res) => {
   const wasCanceled = relayAndSoundManager.cancelCurrentGong();
-  responder.send200Response(res, { 
+  responder.send200Response(res, {
     gongCanceled: wasCanceled,
-    message: wasCanceled ? 'Gong canceled successfully' : 'No gong was playing'
+    message: wasCanceled ? 'Gong canceled successfully' : 'No gong was playing',
   });
 });
 
@@ -36,7 +40,7 @@ router.get('/isGongPlaying', (req, res) => {
 router.get('/diagnostics', (req, res) => {
   // Get audio/relay diagnostics
   const audioDiagnostics = relayAndSoundManager.getDiagnostics();
-  
+
   // Server health info
   const memUsage = process.memoryUsage();
   const serverHealth = {
@@ -46,20 +50,20 @@ router.get('/diagnostics', (req, res) => {
     uptime: process.uptime(),
     uptimeFormatted: formatUptime(process.uptime()),
     memory: {
-      heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024) + ' MB',
-      heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024) + ' MB',
-      rss: Math.round(memUsage.rss / 1024 / 1024) + ' MB',
+      heapUsed: `${Math.round(memUsage.heapUsed / 1024 / 1024)} MB`,
+      heapTotal: `${Math.round(memUsage.heapTotal / 1024 / 1024)} MB`,
+      rss: `${Math.round(memUsage.rss / 1024 / 1024)} MB`,
     },
     nodeEnv: process.env.NODE_ENV || 'development',
   };
-  
+
   // Data files status
   const dataFilesStatus = {};
   for (const file of dataPaths.DYNAMIC_DATA_FILES) {
     const validation = dataPaths.validateJsonFile(dataPaths.getDataFilePath(file));
     dataFilesStatus[file] = validation.valid ? 'OK' : validation.error;
   }
-  
+
   // Schedule info
   const nextJob = scheduleManager.getNextScheduledJob();
   const scheduleInfo = {
@@ -68,7 +72,7 @@ router.get('/diagnostics', (req, res) => {
       isManual: nextJob.isManual,
     } : null,
   };
-  
+
   // Combine all diagnostics
   const diagnostics = {
     ...audioDiagnostics,
@@ -77,7 +81,7 @@ router.get('/diagnostics', (req, res) => {
     dataDirectory: dataPaths.DATA_DIR,
     schedule: scheduleInfo,
   };
-  
+
   responder.send200Response(res, diagnostics);
 });
 
@@ -87,13 +91,13 @@ function formatUptime(seconds) {
   const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);
-  
+
   const parts = [];
   if (days > 0) parts.push(`${days}d`);
   if (hours > 0) parts.push(`${hours}h`);
   if (minutes > 0) parts.push(`${minutes}m`);
   parts.push(`${secs}s`);
-  
+
   return parts.join(' ');
 }
 

@@ -17,32 +17,7 @@ function getStaticData(req, res, next) {
 
   staticData.areas = staticData.areas.filter((value, index) => index <= NO_OF_PORTS);
 
-  fs.readdir(dataPaths.I18N_ASSETS_DIR, (error, files) => {
-    if (error) {
-      const newErr = new Error('Failed to read language directory');
-      responder.sendErrorResponse(res, 500, 'Error in uploadCourses ', newErr, req);
-      logger.error('Failed to read language directory', { error });
-    }
-    try {
-      const languageObj = [];
-      files.forEach((file) => {
-        rawData = fs.readFileSync(dataPaths.getI18nPath(file));
-        const lastDotIndex = file.lastIndexOf('.');
-        const language = file.substr(lastDotIndex - 2, 2);
-        languageObj.push({
-          language,
-          translation: JSON.parse(rawData.toString()),
-        });
-      });
-      staticData.languages = languageObj;
-
-      responder.send200Response(res, staticData);
-    } catch (e) {
-      const newErr = new Error('Failed to read languages files');
-      responder.sendErrorResponse(res, 500, 'Error in uploadCourses ', newErr, req);
-      logger.error('Failed to read languages files', { error: e });
-    }
-  });
+  responder.send200Response(res, staticData);
 }
 
 function getCoursesSchedule(req, res, next) {
@@ -206,17 +181,6 @@ async function deleteGongFile(req, res, next) {
   }
 }
 
-function languagesUpdate(req, res, next) {
-  const retLanguagesUpdatePromise = persistManager.updateLanguages(req.body);
-
-  retLanguagesUpdatePromise.then(
-    () => {
-      responder.send200Response(res, true);
-    }, (err) => {
-      responder.sendErrorResponse(res, err.httpStatusCode || 500, 'Error in scheduleCourse ', err);
-    });
-}
-
 
 function removeScheduledCourse(req, res, next) {
   const retStatus = gongsManager.removeScheduledCourse(req.body);
@@ -293,7 +257,6 @@ module.exports = {
   removeCourse,
   uploadGong,
   deleteGongFile,
-  languagesUpdate,
   removeScheduledCourse,
   addUser,
   removeUser,
