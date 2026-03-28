@@ -32,6 +32,7 @@ const getNextGong = (req, res, next) => {
     currentServerTime,
     nextScheduledJob,
     staticDataLastUpdateTime: lastUpdatedTime,
+    optionalAreas: dataPaths.OPTIONAL_AREAS,
   };
   responder.send200Response(res, retObject);
 };
