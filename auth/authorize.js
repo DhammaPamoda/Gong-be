@@ -51,6 +51,8 @@ function authorize(roles = []) {
           '/api/relay/diagnostics',
           '/data/staticData',
           '/api/data/staticData',
+          '/api/data/emergencyState',
+          '/data/emergencyState',
           '/loginPage',
           '/mainPage',
           '/favicon.ico',

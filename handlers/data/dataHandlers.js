@@ -8,6 +8,7 @@ const persistManager = require('../../lib/persist/persistManager');
 const utilsManager = require('../../lib/utilsManager');
 const logger = require('../../lib//logger');
 const dataPaths = require('../../lib/config/dataPaths');
+const oref = require('../../lib/oref');
 
 const NO_OF_PORTS = process.env.NO_OF_PORTS ? Number.parseInt(process.env.NO_OF_PORTS, 10) : 4;
 
@@ -243,11 +244,28 @@ async function updatePermissions(req, res, next) {
   }
 }
 
+function getEmergencyState(req, res, next) {
+  responder.send200Response(res, oref.getEmergencyState());
+}
+
+function clearEmergencyState(req, res, next) {
+  oref.clearEmergencyState();
+  responder.send200Response(res, 'SUCCESS');
+}
+
+function triggerTestEmergency(req, res, next) {
+  oref.isEmergencyState = true;
+  responder.send200Response(res, 'SUCCESS');
+}
+
 module.exports = {
   getStaticData,
   getCourseByName,
   getCoursesSchedule,
   getManualGongsList,
+  getEmergencyState,
+  clearEmergencyState,
+  triggerTestEmergency,
   getUsersList,
   addManualGong,
   toggleGong,
@@ -263,4 +281,6 @@ module.exports = {
   updateUser,
   resetUserPassword,
   updatePermissions,
+  getEmergencyState,
+  clearEmergencyState,
 };

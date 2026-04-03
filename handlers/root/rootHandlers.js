@@ -10,6 +10,8 @@ const Gong = require('../../model/gong');
 const hk4Manager = require('../../lib/hk4Manager');
 
 
+const systemSettingsManager = require('../../lib/systemSettingsManager');
+
 const authenticate = async (req, res, next) => {
   const token = await authenticateFunc({
     username: req.body.username,
@@ -26,6 +28,7 @@ const getNextGong = (req, res, next) => {
   const rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
   const { lastUpdatedTime } = JSON.parse(rawData.toString());
 
+  const settings = systemSettingsManager.getSettings();
   const nextScheduledJob = scheduleManager.getNextScheduledJob();
   const currentServerTime = moment().valueOf();
   const retObject = {
@@ -33,6 +36,7 @@ const getNextGong = (req, res, next) => {
     nextScheduledJob,
     staticDataLastUpdateTime: lastUpdatedTime,
     optionalAreas: dataPaths.OPTIONAL_AREAS,
+    runSecurityCheck: !!settings.runSecurityCheck,
   };
   responder.send200Response(res, retObject);
 };

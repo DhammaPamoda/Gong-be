@@ -43,6 +43,10 @@ router.post('/permissions/update', dataHandlers.updatePermissions);
 
 router.delete('/coursesSchedule/remove', dataHandlers.removeScheduledCourse);
 
+router.get('/emergencyState', dataHandlers.getEmergencyState);
+router.delete('/emergencyState', dataHandlers.clearEmergencyState);
+router.post('/testEmergency', dataHandlers.triggerTestEmergency);
+
 router.use((req, res) => {
   responder.sendErrorResponse(res, 404, 'Request is not mapped for this server ', null);
 });
