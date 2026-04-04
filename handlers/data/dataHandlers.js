@@ -254,8 +254,43 @@ function clearEmergencyState(req, res, next) {
 }
 
 function triggerTestEmergency(req, res, next) {
-  oref.isEmergencyState = true;
-  responder.send200Response(res, 'SUCCESS');
+  const { category } = req.body;
+  if (!category) {
+    return responder.sendErrorResponse(res, 400, 'Missing category');
+  }
+
+  const categoryMap = {
+    'prepare': 14,
+    'siren': 1,
+    'end': 13
+  };
+
+  const categoryValue = categoryMap[category];
+
+  if (categoryValue === undefined) {
+    return responder.sendErrorResponse(res, 400, 'Invalid category map');
+  }
+
+  const moment = require('moment');
+  const systemSettingsManager = require('../../lib/systemSettingsManager');
+  const settings = systemSettingsManager.getSettings();
+
+  // Advance by 1 second to ensure it bypasses any 'recentAlertTime' identical timestamp checks
+  const alertTime = moment().add(1, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+
+  try {
+    const simulatedPayload = [{
+      alertDate: alertTime,
+      data: settings.alertLocation ? settings.alertLocation.trim() : 'simulate',
+      category: categoryValue
+    }];
+
+    oref.processAlerts(simulatedPayload);
+    responder.send200Response(res, 'SUCCESS');
+  } catch (err) {
+    console.error('TestEmergency caught error:', err);
+    responder.sendErrorResponse(res, 500, err.message);
+  }
 }
 
 module.exports = {
