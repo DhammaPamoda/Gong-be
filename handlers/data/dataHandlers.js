@@ -9,6 +9,11 @@ const utilsManager = require('../../lib/utilsManager');
 const logger = require('../../lib//logger');
 const dataPaths = require('../../lib/config/dataPaths');
 const oref = require('../../lib/oref');
+const {
+  EMERGENCY_ACTIVE,
+  EMERGENCY_END,
+  EMERGENCY_PREPARE
+} = require('../../model/israel/activeAlertCategories');
 
 const NO_OF_PORTS = process.env.NO_OF_PORTS ? Number.parseInt(process.env.NO_OF_PORTS, 10) : 4;
 
@@ -260,9 +265,9 @@ function triggerTestEmergency(req, res, next) {
   }
 
   const categoryMap = {
-    'prepare': 14,
-    'siren': 1,
-    'end': 13
+    'prepare': EMERGENCY_PREPARE,
+    'siren': EMERGENCY_ACTIVE,
+    'end': EMERGENCY_END
   };
 
   const categoryValue = categoryMap[category];
