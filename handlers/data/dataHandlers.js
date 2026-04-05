@@ -96,8 +96,7 @@ function uploadCourses(req, res, next) {
   const form = new IncomingForm();
 
   form.on('file', (field, file) => {
-
-    fs.readFile(file.path, async (err, data) => {
+    fs.readFile(file.filepath, async (err, data) => {
       if (err) {
         const newErr = new Error('Failed to read file');
         responder.sendErrorResponse(res, 500, 'Error in uploadCourses ', newErr, req);
@@ -142,8 +141,8 @@ async function removeCourse(req, res, next) {
     await persistManager.deleteCoursesTemplates(req.body.courseName);
     responder.send200Response(res);
   } catch (e) {
-    responder.sendErrorResponse(res, 500, 'Error in uploadCourses ', e, req);
-    logger.error('uploadCourses Failed', { error: e });
+    responder.sendErrorResponse(res, 500, 'Error in removeCourse ', e, req);
+    logger.error('removeCourse Failed', { error: e });
   }
 }
 
@@ -155,13 +154,13 @@ function uploadGong(req, res, next) {
       responder.sendErrorResponse(res, 500, 'Error in uploadGong ', err);
     } else {
       try {
-        const { file } = files;
-        const { gongId } = fields;
-        await persistManager.addOrUpdateGong(file.name, file.path, gongId);
+        const file = files.file[0];
+        const gongId = fields.gongId[0];
+        await persistManager.addOrUpdateGong(file.originalFilename, file.filepath, gongId);
         responder.send200Response(res);
       } catch (e) {
         responder.sendErrorResponse(res, 500, 'Error in uploadGong ', e, req);
-        logger.error('uploadCourses Failed', { error: e });
+        logger.error('uploadGong Failed', { error: e });
       }
     }
   });
@@ -182,8 +181,8 @@ async function deleteGongFile(req, res, next) {
     await persistManager.deleteGong(req.body.gongId);
     responder.send200Response(res);
   } catch (e) {
-    responder.sendErrorResponse(res, 500, 'Error in uploadGong ', e, req);
-    logger.error('uploadCourses Failed', { error: e });
+    responder.sendErrorResponse(res, 500, 'Error in deleteGongFile ', e, req);
+    logger.error('deleteGongFile Failed', { error: e });
   }
 }
 

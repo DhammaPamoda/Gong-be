@@ -1,5 +1,5 @@
 {
-    "lastUpdatedTime": 1761398997,
+    "lastUpdatedTime": 1775375726898,
     "areas": [
         {
             "id": 0,
@@ -95,6 +95,11 @@
             "id": 113,
             "name": "prepare",
             "pathName": "prepare-for-alarm.mp3"
+        },
+        {
+            "id": 114,
+            "name": "gong-double-1",
+            "pathName": "gong-double-1.mp3"
         }
     ],
     "permissions": [
