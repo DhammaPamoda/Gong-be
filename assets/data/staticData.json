@@ -189,72 +189,6 @@
     ],
     "courses": [
         {
-            "course_name": "10_day_course",
-            "days_count": 12,
-            "course_agenda": [
-                {
-                    "days": [
-                        0
-                    ],
-                    "gongs": {
-                        "times": [
-                            "20:00"
-                        ],
-                        "areas": [
-                            0
-                        ],
-                        "type": 1
-                    }
-                },
-                {
-                    "days": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10
-                    ],
-                    "gongs": {
-                        "times": [
-                            "4:00",
-                            "4:20",
-                            "6:30",
-                            "7:50",
-                            "11:00",
-                            "12:50",
-                            "14:20",
-                            "17:00",
-                            "17:50"
-                        ],
-                        "areas": [
-                            0
-                        ],
-                        "type": 1
-                    }
-                },
-                {
-                    "days": [
-                        11
-                    ],
-                    "gongs": {
-                        "times": [
-                            "4:00",
-                            "4:20"
-                        ],
-                        "areas": [
-                            0
-                        ],
-                        "type": 1
-                    }
-                }
-            ]
-        },
-        {
             "course_name": "satipattana",
             "days_count": 10,
             "course_agenda": [
@@ -707,6 +641,1780 @@
                         ],
                         "type": 2,
                         "repeat": 2
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "10 days course",
+            "days_count": 12,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "12:20",
+                            "18:00"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 1,2,3,5,6,7,8,9",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "12:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 1,2,3,5,6,7,8,9",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:07",
+                            "11:00",
+                            "14:16",
+                            "14:25",
+                            "15:37",
+                            "17:00",
+                            "19:07",
+                            "20:35"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 1,2,3,5,6,7,8,9",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "11:01",
+                            "14:15",
+                            "17:01"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "11:01",
+                            "13:45"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Single Gong DW Dining Day 1,2,3,4,5,6,7,8,9,10",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "7:45",
+                            "11:30",
+                            "17:20",
+                            "17:45"
+                        ],
+                        "areas": [
+                            5
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "12:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:07",
+                            "11:00",
+                            "13:46",
+                            "13:55",
+                            "15:07",
+                            "17:00",
+                            "19:07",
+                            "20:35"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 10",
+                    "days": [
+                        10
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 10",
+                    "days": [
+                        10
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:07",
+                            "11:00",
+                            "17:00",
+                            "19:07"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 11",
+                    "days": [
+                        11
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "9:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            0
+                        ],
+                        "type": 1
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "10 days special",
+            "days_count": 12,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "12:20",
+                            "18:00"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 1-9",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "12:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 1-3,5-9",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:00",
+                            "11:00",
+                            "14:17",
+                            "15:30",
+                            "17:00",
+                            "19:08",
+                            "21:01"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 1-3,5-9",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "09:01",
+                            "11:01",
+                            "14:18",
+                            "15:31",
+                            "17:01",
+                            "21:00"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "11:00",
+                            "13:50",
+                            "17:00",
+                            "19:08",
+                            "21:01"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "11:01",
+                            "13:49",
+                            "17:01",
+                            "21:00"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Single Gong DW Dining Day 1-10",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "11:30"
+                        ],
+                        "areas": [
+                            5
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "15:08"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 10",
+                    "days": [
+                        10
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 10",
+                    "days": [
+                        10
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:08",
+                            "11:00",
+                            "17:00",
+                            "19:08"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 10",
+                    "days": [
+                        10
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:31",
+                            "11:01",
+                            "15:30"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 11",
+                    "days": [
+                        11
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "9:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            0
+                        ],
+                        "type": 1
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "1DC - ",
+            "days_count": 1,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) - Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "12:30",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) - Day 1",
+                    "days": [
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "04:00",
+                            "04:20",
+                            "07:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) - Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "14:26",
+                            "15:40",
+                            "17:00",
+                            "19:07",
+                            "20:23"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) - Day 1",
+                    "days": [
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:30",
+                            "09:08",
+                            "10:00",
+                            "10:07",
+                            "11:16",
+                            "12:00"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong - Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "17:01"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Hall Single Gong - Day 1",
+                    "days": [
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "10:01"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "1DC - 9AM",
+            "days_count": 1,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall)",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "8:42",
+                            "13:05",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall)",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "9:56",
+                            "11:06",
+                            "14:16",
+                            "14:25",
+                            "15:37",
+                            "16:15"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "07:01",
+                            "14:15"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Double Gong DW Dining Day",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "12:30"
+                        ],
+                        "areas": [
+                            5
+                        ],
+                        "type": 3
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "1DC - Yom Kippur",
+            "days_count": 1,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall)",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "7:50",
+                            "12:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall)",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "8:55",
+                            "10:05",
+                            "11:15",
+                            "13:55",
+                            "15:05",
+                            "19:07"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "11:14"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Single Gong DW Dining Day",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "12:00"
+                        ],
+                        "areas": [
+                            5
+                        ],
+                        "type": 3
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "20 days course",
+            "days_count": 22,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "12:20",
+                            "18:00"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 1-19",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "12:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 1-7,9-19",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:00",
+                            "11:00",
+                            "14:17",
+                            "15:30",
+                            "17:00",
+                            "19:08",
+                            "21:01"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 1-7,9-19",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "09:01",
+                            "11:01",
+                            "14:18",
+                            "15:31",
+                            "17:01",
+                            "21:00"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 8",
+                    "days": [
+                        8
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "11:00",
+                            "14:17",
+                            "15:30",
+                            "17:00",
+                            "19:08",
+                            "21:01"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 8",
+                    "days": [
+                        8
+                    ],
+                    "gongs": {
+                        "times": [
+                            "06:31",
+                            "11:01",
+                            "14:18",
+                            "15:31",
+                            "17:01",
+                            "21:00"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Single Gong DW Dining Day 1-20",
+                    "days": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "11:30"
+                        ],
+                        "areas": [
+                            5
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 8",
+                    "days": [
+                        8
+                    ],
+                    "gongs": {
+                        "times": [
+                            "09:08"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 20",
+                    "days": [
+                        20
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 20",
+                    "days": [
+                        20
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:08",
+                            "11:00",
+                            "17:00",
+                            "19:08"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 20",
+                    "days": [
+                        20
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:31",
+                            "11:01",
+                            "15:30"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 21",
+                    "days": [
+                        21
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "9:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            0
+                        ],
+                        "type": 1
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "3 day course long 0-4",
+            "days_count": 5,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:50",
+                            "12:20",
+                            "18:00"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 1,2",
+                    "days": [
+                        1,
+                        2
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "12:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 1,2",
+                    "days": [
+                        1,
+                        2
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:07",
+                            "11:00",
+                            "14:16",
+                            "14:25",
+                            "15:37",
+                            "17:00",
+                            "19:07"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 1,2",
+                    "days": [
+                        1,
+                        2
+                    ],
+                    "gongs": {
+                        "times": [
+                            "11:01",
+                            "14:15",
+                            "17:01"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 3",
+                    "days": [
+                        3
+                    ],
+                    "gongs": {
+                        "times": [
+                            "11:01"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Single Gong DW Dining Day 1,2,3",
+                    "days": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "11:30"
+                        ],
+                        "areas": [
+                            5
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 3",
+                    "days": [
+                        3
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "12:50",
+                            "13:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 3",
+                    "days": [
+                        3
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:07",
+                            "11:00",
+                            "13:45",
+                            "17:00",
+                            "19:07"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "14:20"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 4",
+                    "days": [
+                        4
+                    ],
+                    "gongs": {
+                        "times": [
+                            "9:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "3 day course short 0-3",
+            "days_count": 4,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 0",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:50",
+                            "12:20",
+                            "18:00"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 1,2",
+                    "days": [
+                        1,
+                        2
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "12:50",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 1,2",
+                    "days": [
+                        1,
+                        2
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:07",
+                            "11:00",
+                            "14:16",
+                            "14:25",
+                            "15:37",
+                            "17:00",
+                            "19:07"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "Hall Single Gong Day 1,2",
+                    "days": [
+                        1,
+                        2
+                    ],
+                    "gongs": {
+                        "times": [
+                            "11:01",
+                            "14:15",
+                            "17:01"
+                        ],
+                        "areas": [
+                            1
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Single Gong DW Dining Day 1,2,3",
+                    "days": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "11:30"
+                        ],
+                        "areas": [
+                            5
+                        ],
+                        "type": 3
+                    }
+                },
+                {
+                    "title": "Long Gong (no hall) Day 3",
+                    "days": [
+                        3
+                    ],
+                    "gongs": {
+                        "times": [
+                            "4:00",
+                            "4:20",
+                            "7:50",
+                            "13:20"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 3",
+                    "days": [
+                        3
+                    ],
+                    "gongs": {
+                        "times": [
+                            "6:30",
+                            "9:07",
+                            "11:00",
+                            "14:35",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "ChildTeen",
+            "days_count": 1,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall)",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "5:50",
+                            "9:40",
+                            "9:55",
+                            "11:08",
+                            "12:53",
+                            "14:23",
+                            "15:23",
+                            "16:30",
+                            "17:15",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall)",
+                    "days": [
+                        0
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:30"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "Gardening Summer (2 Days)",
+            "days_count": 2,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 1,2",
+                    "days": [
+                        0,
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "9:50",
+                            "14:20",
+                            "19:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 1,2",
+                    "days": [
+                        0,
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "5:30",
+                            "7:00",
+                            "12:30",
+                            "17:00"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "Service (2 Days)",
+            "days_count": 2,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 1,2",
+                    "days": [
+                        0,
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 1,2",
+                    "days": [
+                        0,
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "10:30",
+                            "12:30"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "One Gong (no hall) Day 1,2",
+                    "days": [
+                        0,
+                        1
+                    ],
+                    "gongs": {
+                        "times": [
+                            "5:40"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 3
+                    }
+                }
+            ]
+        },
+        {
+            "course_name": "Service (7 Days)",
+            "days_count": 7,
+            "course_agenda": [
+                {
+                    "title": "Long Gong (no hall) Day 0-6",
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:50",
+                            "14:20",
+                            "17:50"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 1
+                    }
+                },
+                {
+                    "title": "Short Gong (no hall) Day 0,1",
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ],
+                    "gongs": {
+                        "times": [
+                            "7:00",
+                            "10:30",
+                            "12:30"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 2
+                    }
+                },
+                {
+                    "title": "One Gong (no hall) Day 1,2",
+                    "days": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ],
+                    "gongs": {
+                        "times": [
+                            "5:40"
+                        ],
+                        "areas": [
+                            2,
+                            3,
+                            4
+                        ],
+                        "type": 3
                     }
                 }
             ]
