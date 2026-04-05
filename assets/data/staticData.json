@@ -1,5 +1,5 @@
 {
-    "lastUpdatedTime": 1775375726898,
+    "lastUpdatedTime": 1775377575527,
     "areas": [
         {
             "id": 0,
@@ -73,12 +73,17 @@
     "gongTypes": [
         {
             "id": 1,
-            "name": "long",
+            "name": "Long",
             "pathName": "gong-long.wav"
         },
         {
             "id": 2,
-            "name": "gong-single1",
+            "name": "Short 3",
+            "pathName": "gong-short3.mp3"
+        },
+        {
+            "id": 3,
+            "name": "Single 1",
             "pathName": "gong-single1.mp3"
         },
         {
@@ -95,11 +100,6 @@
             "id": 113,
             "name": "prepare",
             "pathName": "prepare-for-alarm.mp3"
-        },
-        {
-            "id": 114,
-            "name": "gong-double-1",
-            "pathName": "gong-double-1.mp3"
         }
     ],
     "permissions": [
