@@ -28,11 +28,11 @@ function authorize(roles = []) {
 
   return [
     // For Debugging
-    (req, res, next) => {
+    /* (req, res, next) => {
       console.log('Authorization Entry point. Req( method ,path ,time) :', req.path,
         ' , ', req.method, ' , ', moment().format('HH:mm:ss:ms'));
       next();
-    },
+    }, */
     // authenticate JWT token and attach user to request object (req.user)
     expressJwt({
       secret: secretCallback,
