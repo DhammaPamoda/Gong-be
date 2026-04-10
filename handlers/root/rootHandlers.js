@@ -35,7 +35,7 @@ const getNextGong = (req, res, next) => {
     currentServerTime,
     nextScheduledJob,
     staticDataLastUpdateTime: lastUpdatedTime,
-    optionalAreas: dataPaths.OPTIONAL_AREAS,
+    areas: settings.areas,
     runSecurityCheck: !!settings.runSecurityCheck,
   };
   responder.send200Response(res, retObject);

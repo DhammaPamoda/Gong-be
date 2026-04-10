@@ -21,7 +21,9 @@ function getStaticData(req, res, next) {
   let rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
   const staticData = JSON.parse(rawData.toString());
 
-  staticData.areas = staticData.areas.filter((value, index) => index <= NO_OF_PORTS);
+  if (staticData.areas) {
+    staticData.areas = staticData.areas.filter((value, index) => index <= NO_OF_PORTS);
+  }
 
   responder.send200Response(res, staticData);
 }
