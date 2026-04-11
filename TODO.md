@@ -11,3 +11,9 @@ This file tracks requested features and improvements that couldn't be logged as 
 ## Maintenance
 - [ ] **TypeScript Cleanup**: Address remaining Angular TypeScript compilation warnings in the frontend (`Gong_fe`) to improve build stability.
 - [ ] **Formidable Migration**: Double-check all other upload handlers to ensure they are fully compatible with Formidable 3.x extra features (if needed).
+
+## Bug Fixes
+- [ ] **Course Removal Failure (Zombie Schedules)**: Fix `removeScheduledCourse` failing for courses that exist in `coursesSchedule.json` but aren't in memory (e.g., after the last gong of the day).
+- [ ] **Limbo Course Logic**: Update `handleJsonCourseScheduleRecord` to properly archive courses that have finished all gongs but haven't reached their end date yet.
+- [ ] **Startup Robustness**: Prevent server from failing to load all schedules if one schedule refers to a renamed or missing course template.
+- [ ] **Areas filter TypeError**: Fix potential crash in `getStaticData` if `staticData.areas` is an object or missing.
