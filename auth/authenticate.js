@@ -6,17 +6,35 @@ async function authenticatePassword(aPassword, aUserConfig) {
   return bcrypt.compare(aPassword, aUserConfig.encodedPasswd);
 }
 
-async function authenticate({ username, password }) {
+function getTokenExpirationTime(clientType) {
+  switch (clientType) {
+    case 'remote':
+      return '24h';
+
+    case 'local':
+      return '180d';
+    default:
+      return '180d';
+  }
+}
+
+async function authenticate({ username, password, isLocal }) {
+  const clientType = isLocal ? 'local' : 'remote';
   if (username && password) {
     const userConfig = utilsManager.usersMap.get(username.toLowerCase());
     if (userConfig) {
       const retToken = await authenticatePassword(password, userConfig)
         .then((res) => {
           if (res === true) {
-            const token = jwt.sign({
-              sub: userConfig.id,
-              role: userConfig.role,
-            }, userConfig.tokenSecret, { expiresIn: 60 * 20 });
+            const token = jwt.sign(
+              {
+                sub: userConfig.id,
+                role: userConfig.role,
+              },
+              userConfig.tokenSecret,
+              {
+                expiresIn: getTokenExpirationTime(clientType)
+              });
             // console.log( 'Decoded token :' , jwt.verify(token, userConfig.tokenSecret))
             return token;
           }

@@ -13,9 +13,11 @@ const hk4Manager = require('../../lib/hk4Manager');
 const systemSettingsManager = require('../../lib/systemSettingsManager');
 
 const authenticate = async (req, res, next) => {
+  const isLocal = req.ip === '::ffff:127.0.0.1';
   const token = await authenticateFunc({
     username: req.body.username,
     password: req.body.password,
+    isLocal,
   });
   if (token) {
     responder.send200Response(res, { token });
