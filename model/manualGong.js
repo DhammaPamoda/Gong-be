@@ -1,5 +1,5 @@
+const moment = require('moment');
 const Gong = require('./gong');
-const { getLocalOffsetDetailsFromTimestamp } = require('../lib/utils/time');
 
 const milSecInMin = 60000;
 
@@ -10,12 +10,17 @@ module.exports = class ManualGong {
     this.gong = aGong;
 
     this.cloneWhileAddingTime = (courseStartTimeInMSec, courseStartDateUtcOffsetInMinutes) => {
-      // Checking UTC offset to handle DST issues
-      const futureGongTimeInMSec = this.time + courseStartTimeInMSec
-      const futureGongTimeUtcOffset = getLocalOffsetDetailsFromTimestamp(futureGongTimeInMSec);
-      const offsetDifference = futureGongTimeUtcOffset.rawMinutes - courseStartDateUtcOffsetInMinutes;
+      // Using moment to handle DST correctly by adding days as calendar days
+      const daysOffset = Math.floor(this.time / (24 * 3600 * 1000));
+      const msOffset = this.time % (24 * 3600 * 1000);
+      
+      const gongTime = moment(courseStartTimeInMSec)
+        .add(daysOffset, 'd')
+        .add(msOffset, 'ms')
+        .valueOf();
+
       const newManualGong = new ManualGong(
-        futureGongTimeInMSec + (offsetDifference * milSecInMin),
+        gongTime,
         this.gong,
         this.isActive,
       );
