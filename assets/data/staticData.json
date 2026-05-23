@@ -2342,25 +2342,21 @@
         },
         {
             "course_name": "ChildTeen",
-            "days_count": 1,
+            "days_count": 2,
             "course_agenda": [
                 {
-                    "title": "Long Gong (no hall)",
+                    "title": "Course Prep Day - Short Gongs",
                     "days": [
                         0
                     ],
                     "gongs": {
                         "times": [
-                            "5:50",
-                            "9:40",
-                            "9:53",
-                            "11:23",
+                            "9:50",
                             "13:07",
-                            "14:23",
-                            "15:35",
-                            "16:30",
-                            "17:15",
-                            "17:50"
+                            "13:50",
+                            "15:15",
+                            "17:50",
+                            "19:15"
                         ],
                         "areas": [
                             1,
@@ -2368,17 +2364,27 @@
                             6,
                             7
                         ],
-                        "type": 1
+                        "type": 2
                     }
                 },
                 {
-                    "title": "Short Gong (no hall)",
+                    "title": "Course Day - Short Gongs",
                     "days": [
-                        0
+                        1
                     ],
                     "gongs": {
                         "times": [
-                            "7:15"
+                            "5:50",
+                            "7:15",
+                            "9:40",
+                            "9:53",
+                            "11:23",
+                            "13:08",
+                            "14:23",
+                            "15:35",
+                            "16:30",
+                            "17:15",
+                            "17:50"
                         ],
                         "areas": [
                             1,
