@@ -15,6 +15,8 @@ router.get('/gongs/list', dataHandlers.getManualGongsList);
 
 router.get('/users/list', dataHandlers.getUsersList);
 
+router.get('/checkAuth', dataHandlers.checkAuth);
+
 router.post('/gong/add', dataHandlers.addManualGong);
 
 router.post('/gong/toggle', dataHandlers.toggleGong);

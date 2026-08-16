@@ -299,7 +299,12 @@ function triggerTestEmergency(req, res, next) {
   }
 }
 
+function checkAuth(req, res, next) {
+  responder.send200Response(res, { authenticated: true });
+}
+
 module.exports = {
+  checkAuth,
   getStaticData,
   getCourseByName,
   getCoursesSchedule,
