@@ -11,6 +11,8 @@ router.get('/coursesSchedule', dataHandlers.getCoursesSchedule);
 
 router.get('/course/:id', dataHandlers.getCourseByName);
 
+router.get('/course', dataHandlers.getCourses);
+
 router.get('/gongs/list', dataHandlers.getManualGongsList);
 
 router.get('/users/list', dataHandlers.getUsersList);
@@ -42,6 +44,8 @@ router.post('/user/update', dataHandlers.updateUser);
 router.post('/user/resetPassword', dataHandlers.resetUserPassword);
 
 router.post('/permissions/update', dataHandlers.updatePermissions);
+
+router.post('/courseAgenda', dataHandlers.updateCourseAgenda);
 
 router.post('/coursesSchedule/remove', dataHandlers.removeScheduledCourse);
 
