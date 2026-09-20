@@ -116,27 +116,27 @@ function countSourceData(sourceData) {
 
 async function clearTables(manager) {
   // Delete child rows first so this remains safe if foreign keys are added later.
-  await manager.delete('system_settings', {});
-  await manager.delete('hk4_key_sequence_areas', {});
-  await manager.delete('hk4_key_sequences', {});
-  await manager.delete('course_template_agenda_days', {});
-  await manager.delete('course_template_agenda_times', {});
-  await manager.delete('course_template_agenda_areas', {});
-  await manager.delete('manual_gong_areas', {});
-  await manager.delete('scheduled_course_exceptions', {});
-  await manager.delete('course_template_agenda', {});
-  await manager.delete('manual_gongs', {});
-  await manager.delete('scheduled_courses', {});
-  await manager.delete('course_templates', {});
-  await manager.delete('permissions', {});
-  await manager.delete('users', {});
-  await manager.delete('gong_types', {});
-  await manager.delete('areas', {});
+    await manager.clear('system_settings');
+    await manager.clear('hk4_key_sequence_areas');
+    await manager.clear('hk4_key_sequences');
+    await manager.clear('course_template_agenda_days');
+    await manager.clear('course_template_agenda_times');
+    await manager.clear('course_template_agenda_areas');
+    await manager.clear('manual_gong_areas');
+    await manager.clear('scheduled_course_exceptions');
+    await manager.clear('course_template_agenda');
+    await manager.clear('manual_gongs');
+    await manager.clear('scheduled_courses');
+    await manager.clear('course_templates');
+    await manager.clear('permissions');
+    await manager.clear('users');
+    await manager.clear('gong_types');
+    await manager.clear('areas');
 }
 
 async function migrate(options, sourceData) {
   const dataSource = new DataSource({
-    type: 'sqlite',
+    type: 'better-sqlite3',
     database: path.resolve(options.database),
     entities: entitySchemas,
     synchronize: true,
@@ -151,6 +151,12 @@ async function migrate(options, sourceData) {
         id: Number(area.id),
         name: area.name,
         translation: area.translation || null,
+      })));
+
+      await manager.insert('gong_types', sourceData.gongTypes.map(gongType => ({
+        id: Number(gongType.id),
+        name: gongType.name,
+        pathName: gongType.pathName,
       })));
 
       await manager.insert('system_settings', {
@@ -181,12 +187,6 @@ async function migrate(options, sourceData) {
           })));
         }
       }
-
-      await manager.insert('gong_types', sourceData.gongTypes.map(gongType => ({
-        id: Number(gongType.id),
-        name: gongType.name,
-        pathName: gongType.pathName,
-      })));
 
       for (const course of sourceData.courses) {
         const templateResult = await manager.insert('course_templates', {
