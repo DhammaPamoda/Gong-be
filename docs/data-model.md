@@ -9,7 +9,7 @@ This document describes application data that is created, changed, or retained b
 | `~/.local/share/gong/{dev-or-prod}/` | Dynamic schedules and generated history. The path is defined in [lib/config/dataPaths.js](../lib/config/dataPaths.js). |
 | `~/.local/share/gong/{dev-or-prod}/gong.sqlite` | SQLite-backed runtime data, including manual gongs. |
 | `assets/data/staticData.json` | User-managed course templates, gong catalog metadata, and permission assignments. Agenda records contain area IDs. |
-| `~/.local/share/gong/{dev-or-prod}/systemSettings.json` | Runtime settings. The legacy file may also contain the alert module's area map. |
+| `~/.local/share/gong/{dev-or-prod}/systemSettings.json` | Legacy source for runtime settings. Area names are migrated into SQLite `areas`. |
 | `assets/data/usersData.json` | User accounts and password hashes. |
 | `assets/sounds/` | Uploaded gong audio files. |
 | `logs/` and `~/.local/share/gong/logs/` | Operational and hardware diagnostics. |

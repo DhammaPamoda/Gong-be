@@ -9,6 +9,7 @@ const dataPaths = require('../../lib/config/dataPaths');
 const Gong = require('../../model/gong');
 const hk4Manager = require('../../lib/hk4Manager');
 const systemSettingsManager = require('../../lib/systemSettingsManager');
+const areasDal = require('../../db/dal/areasDal');
 
 const authenticate = async (req, res, next) => {
   const isLocal = req.ip === '::ffff:127.0.0.1';
@@ -24,21 +25,25 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-const getNextGong = (req, res, next) => {
-  const rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
-  const { lastUpdatedTime } = JSON.parse(rawData.toString());
+const getNextGong = async (req, res, next) => {
+  try {
+    const rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
+    const { lastUpdatedTime } = JSON.parse(rawData.toString());
 
-  const settings = systemSettingsManager.getSettings();
-  const nextScheduledJob = scheduleManager.getNextScheduledJob();
-  const currentServerTime = moment().valueOf();
-  const retObject = {
-    currentServerTime,
-    nextScheduledJob,
-    staticDataLastUpdateTime: lastUpdatedTime,
-    areas: settings.areas,
-    runSecurityCheck: !!settings.runSecurityCheck,
-  };
-  responder.send200Response(res, retObject);
+    const settings = systemSettingsManager.getSettings();
+    const nextScheduledJob = scheduleManager.getNextScheduledJob();
+    const currentServerTime = moment().valueOf();
+    const retObject = {
+      currentServerTime,
+      nextScheduledJob,
+      staticDataLastUpdateTime: lastUpdatedTime,
+      areas: await areasDal.getAllAsMap(),
+      runSecurityCheck: !!settings.runSecurityCheck,
+    };
+    responder.send200Response(res, retObject);
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Rolling buffer for HK4 key sequences (max 4 keys)
