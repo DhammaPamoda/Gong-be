@@ -9,6 +9,7 @@ const logger = require('../../lib//logger');
 const dataPaths = require('../../lib/config/dataPaths');
 const permissionsDal = require('../../db/dal/permissionsDal');
 const usersDal = require('../../db/dal/usersDal');
+const scheduledCoursesDal = require('../../db/dal/scheduledCoursesDal');
 const User = require('../../model/user');
 const oref = require('../../lib/oref');
 const {
@@ -31,10 +32,8 @@ async function getStaticData(req, res, next) {
   responder.send200Response(res, staticData);
 }
 
-function getCoursesSchedule(req, res, next) {
-  const rawData = fs.readFileSync(dataPaths.getDataFilePath('coursesSchedule.json'));
-  const coursesSchedule = JSON.parse(rawData);
-  responder.send200Response(res, coursesSchedule);
+async function getCoursesSchedule(req, res, next) {
+  responder.send200Response(res, await scheduledCoursesDal.getActive());
 }
 
 function getCourseByName(req, res, next) {

@@ -79,9 +79,10 @@ testHoursRange?: object
 | Read | Supported as the active schedule list. | `GET /api/data/coursesSchedule` |
 | Update | Partially supported. There is no general edit operation, but gong activation changes add/remove schedule exceptions. | `POST /api/data/gong/toggle` |
 | Delete | Supported by scheduled-course id. | `POST /api/data/coursesSchedule/remove` |
-| Archive | Automatic only. Completed instances are appended to `archivedCoursesSchedule.json`. | `lib/gongsManager.js` |
+| Archive | Automatic only. Completed instances are marked archived in SQLite. | `lib/gongsManager.js` |
 
-Active records are persisted in `coursesSchedule.json`. Completed records are retained in `archivedCoursesSchedule.json`.
+Active and archived records are stored in SQLite `scheduled_courses`; exceptions are stored in
+`scheduled_course_exceptions`.
 
 ## 3. Manual gong
 
