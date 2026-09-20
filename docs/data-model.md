@@ -7,7 +7,8 @@ This document describes application data that is created, changed, or retained b
 | Storage | Purpose |
 | --- | --- |
 | `~/.local/share/gong/{dev-or-prod}/` | Dynamic schedules, manual gongs, and generated history. The path is defined in [lib/config/dataPaths.js](../lib/config/dataPaths.js). |
-| `assets/data/staticData.json` | User-managed course templates, gong catalog metadata, areas, and permission assignments. |
+| `assets/data/staticData.json` | User-managed course templates, gong catalog metadata, and permission assignments. Agenda records contain area IDs. |
+| `~/.local/share/gong/{dev-or-prod}/systemSettings.json` | Runtime settings. The legacy file may also contain the alert module's area map. |
 | `assets/data/usersData.json` | User accounts and password hashes. |
 | `assets/sounds/` | Uploaded gong audio files. |
 | `logs/` and `~/.local/share/gong/logs/` | Operational and hardware diagnostics. |
@@ -198,20 +199,117 @@ name: string
 translation?: string
 ```
 
-Areas are defined in static data and represented in the frontend by [src/app/model/area.ts](../../Gong_fe/src/app/model/area.ts).
+Area definitions are stored in `systemSettings.json` as an object whose keys are area IDs and whose values are names, for example `{ "0": "all" }`. Course agenda records in `staticData.json` and gong records reference those IDs. The frontend represents areas with [src/app/model/area.ts](../../Gong_fe/src/app/model/area.ts).
 
 ### Storage and CRUD
 
 | Operation | Support | Implementation |
 | --- | --- | --- |
 | Create | Not supported by the application API. | None |
-| Read | Supported through static data; the backend limits the returned list by `NO_OF_PORTS`. | `GET /api/data/staticData` |
+| Read | Supported through the server status response, which returns the settings area map. | Root status/next-gong response |
 | Update | Not supported. | None |
 | Delete | Not supported. | None |
 
-Areas are effectively read-only hardware/domain metadata. They are referenced by scheduled and manual gong records.
+Areas are effectively read-only hardware/domain metadata. Oref converts the configured area keys to numeric relay IDs when creating an emergency gong. The values are used as display labels; the current Oref routing logic uses the keys.
 
-## 8. Operational log record
+## 8. HK4 keypad settings
+
+Configuration for four-key hardware sequences that trigger gongs.
+
+### Shape
+
+```text
+enabled: boolean
+sequences: {
+  [sequence: string]: {
+    gongType: number
+    areas: number[]
+    volume: number
+    repeat: number
+  }
+}
+```
+
+The sequence key is the four-key input, such as `"1111"`. Each sequence references a `GongType` and one or more target `Area` IDs. Area `0` remains the legacy all-areas sentinel where used. The global enabled state is represented by `SystemSettings.hk4Enabled`, not by each sequence.
+
+### Storage and CRUD
+
+| Operation | Support | Implementation |
+| --- | --- | --- |
+| Create | The file is initialized with defaults when missing. Individual sequences are created by saving the full map. | `dataPaths.initializeDataFiles`; `POST /api/hk4` |
+| Read | Supported. | `GET /api/hk4` |
+| Update | Supported by replacing the settings document or changing `enabled` through the status endpoint. | `POST /api/hk4`; `POST /api/hk4/status` |
+| Delete | Individual sequences can be removed by saving a map without them. There is no dedicated delete endpoint. | Frontend HK4 configuration |
+
+### Proposed SQLite structure
+
+```text
+hk4_key_sequences            // one row per key sequence
+hk4_key_sequence_areas       // join table to areas
+```
+
+`Hk4KeySequence.gongTypeId` references `GongType`. Its area collection references `Area` through the join table. The migration reads the legacy JSON object and creates these rows.
+
+## 9. System settings
+
+Runtime and emergency-alert settings persisted by the backend.
+
+### Shape
+
+```text
+runSecurityCheck: boolean
+testing?: boolean
+alertLocation: string
+pollingInterval: number
+overrideOrefUrl?: string
+supportedAlertCategories: string[]
+```
+
+The legacy file may also contain an alert-routing map such as:
+
+```json
+{
+  "areas": {
+    "0": "all"
+  }
+}
+```
+
+Course agendas and gong records store area IDs as numeric references. The legacy alert module uses the special key `"0"` to mean all areas. The area map is not part of the SQLite `SystemSettings` entity.
+
+### Storage and CRUD
+
+| Operation | Support | Implementation |
+| --- | --- | --- |
+| Create | The file is initialized with defaults when missing. | `dataPaths.initializeDataFiles` |
+| Read | Supported. The backend loads the file at startup and returns the current settings. | `GET /api/systemSettings` |
+| Update | Supported as a shallow merge of the submitted fields. The file is atomically rewritten and a `settingsUpdated` event is emitted. | `POST /api/systemSettings`; [lib/systemSettingsManager.js](../lib/systemSettingsManager.js) |
+| Delete | Not supported. Individual fields or the whole file are not deleted through the API. | None |
+
+### Runtime consumers
+
+- `runSecurityCheck`, `pollingInterval`, `alertLocation`, and `overrideOrefUrl` control Oref polling and alert filtering.
+- `supportedAlertCategories` filters alert categories before a gong is triggered.
+- `testing` suppresses actual playback while retaining the alert-processing flow.
+- The frontend reads and updates the settings through [system-settings.service.ts](../../Gong_fe/src/app/services/system-settings.service.ts).
+
+The migrated `SystemSettings` row remains file-backed during the transitional SQLite phase. Alert-routing behavior, including the legacy `"0"` all-areas rule, remains owned by the alert module rather than this entity.
+
+The migration currently creates that transitional structure as:
+
+```text
+system_settings
+  id                    // singleton row, currently 1
+  runSecurityCheck
+  testing
+  hk4Enabled
+  alertLocation
+  pollingInterval
+  overrideOrefUrl
+  supportedAlertCategories
+```
+
+## 10. Operational log record
 
 Append-only diagnostic data generated by the server.
 
@@ -234,7 +332,7 @@ A log line may include timestamps, user actions, course/gong data, relay status,
 | Update | No record update; new entries are appended. |
 | Delete | No application operation; rotation/administration may archive or remove files. |
 
-## 9. Frontend cached data
+## 11. Frontend cached data
 
 This is a derived client-side copy, not an independent source of truth.
 
@@ -258,7 +356,7 @@ The frontend stores:
 
 These values are written and read by the frontend services and middleware. Logout removes the token and static-data timestamp; Redux state itself is transient and disappears with the page.
 
-## 10. Runtime-only entities
+## 12. Runtime-only entities
 
 These entities exist while the server is running but do not have independent CRUD persistence:
 
@@ -274,7 +372,6 @@ These support operational commands but have no durable create/read/update/delete
 
 These are application configuration rather than user/domain data:
 
-- `systemSettings.json`
 - `hk4KeyMap.json`
 - `config/default.json` and `config/production.json`
 - i18n translation files
