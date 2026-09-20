@@ -7,6 +7,9 @@ const app = require('./app');
 // const db = require('../lib/db');
 const logger = require('../lib/logger');
 const dataPaths = require('../lib/config/dataPaths');
+const { initializeDatabase } = require('../db/dataSource');
+const systemSettingsManager = require('../lib/systemSettingsManager');
+const hk4Manager = require('../lib/hk4Manager');
 
 const scheduleManager = require('../lib/scheduleManager');
 const gongsManager = require('../lib/gongsManager');
@@ -29,6 +32,8 @@ if (!initResult.success) {
   }
 }
 
+const databaseReady = initializeDatabase();
+
 const server = USE_HTTPS ? https.createServer({
   key: fs.readFileSync('certs/server.key'),
   cert: fs.readFileSync('certs/server.pem'),
@@ -44,29 +49,32 @@ server.on('connection', (conn) => {
   });
 });
 
-server.listen(PORT, () => {
-  exec('whoami', (err, stdout, stderr) => {
-    logger.log('info', '\n');
-    logger.log('info', `Server listening on port ${PORT} using ${USE_HTTPS ? 'https' : 'http'}`);
-    logger.log('info', 'Press CTRL-C to stop');
-    if (err !== null) {
-      logger.error('Failed to retrieve whoami\n', err);
-    } else {
-      logger.log('info', `Whomai = ${stdout}\n`);
-    }
+databaseReady.then(async () => {
+  await systemSettingsManager.initializeFromDatabase();
+  await hk4Manager.initializeFromDatabase();
+
+  scheduleManager.start();
+  scheduleManager.setExecutor(relayAndSoundManager.playGongForJob);
+  gongsManager.addOnGongActionListener(scheduleManager.jobActionFunction.bind(scheduleManager));
+  gongsManager.init();
+  oref.init();
+
+  server.listen(PORT, () => {
+    exec('whoami', (err, stdout, stderr) => {
+      logger.log('info', '\n');
+      logger.log('info', `Server listening on port ${PORT} using ${USE_HTTPS ? 'https' : 'http'}`);
+      logger.log('info', 'Press CTRL-C to stop');
+      if (err !== null) {
+        logger.error('Failed to retrieve whoami\n', err);
+      } else {
+        logger.log('info', `Whomai = ${stdout}\n`);
+      }
+    });
   });
+}).catch((error) => {
+  logger.error('Failed to initialize SQLite database', { error });
+  process.exitCode = 1;
 });
-
-// db.connection.on('error', (err) => {
-//   logger.log('error', `connection error:${err}`);
-// });
-
-scheduleManager.start();
-scheduleManager.setExecutor(relayAndSoundManager.playGongForJob);
-
-gongsManager.addOnGongActionListener(scheduleManager.jobActionFunction.bind(scheduleManager));
-gongsManager.init();
-oref.init();
 
 // ==========================================
 // Startup Logging

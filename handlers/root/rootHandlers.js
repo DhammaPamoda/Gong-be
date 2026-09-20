@@ -8,8 +8,6 @@ const relayAndSoundManager = require('../../lib/relayAndSoundManager');
 const dataPaths = require('../../lib/config/dataPaths');
 const Gong = require('../../model/gong');
 const hk4Manager = require('../../lib/hk4Manager');
-
-
 const systemSettingsManager = require('../../lib/systemSettingsManager');
 
 const authenticate = async (req, res, next) => {
@@ -63,8 +61,8 @@ const handleHK4Key = (req, res, next) => {
     responder.sendErrorResponse(res, 400, 'Invalid key');
     return;
   }
-  const config = hk4Manager.getSettings();
-  if (!config.enabled) {
+  const config = hk4Manager.getSequences();
+  if (!systemSettingsManager.getSettings().hk4Enabled) {
     responder.send200Response(res, { success: true, key });
     return;
   }

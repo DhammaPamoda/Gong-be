@@ -20,21 +20,31 @@ const Hk4KeySequence = new EntitySchema({
       onDelete: 'RESTRICT',
     },
     areas: {
-      type: 'many-to-many',
-      target: 'Area',
-      joinTable: {
-        name: 'hk4_key_sequence_areas',
-        joinColumn: {
-          name: 'sequence',
-          referencedColumnName: 'sequence',
-        },
-        inverseJoinColumn: {
-          name: 'areaId',
-          referencedColumnName: 'id',
-        },
-      },
+      type: 'one-to-many',
+      target: 'Hk4KeySequenceArea',
+      inverseSide: 'sequenceRecord',
     },
   },
 });
 
-module.exports = [Hk4KeySequence];
+const Hk4KeySequenceArea = new EntitySchema({
+  name: 'Hk4KeySequenceArea',
+  tableName: 'hk4_key_sequence_areas',
+  columns: {
+    sequence: { type: String, primary: true },
+    areaId: { type: Number, primary: true },
+  },
+  relations: {
+    sequenceRecord: {
+      type: 'many-to-one',
+      target: 'Hk4KeySequence',
+      joinColumn: {
+        name: 'sequence',
+        referencedColumnName: 'sequence',
+      },
+      onDelete: 'CASCADE',
+    },
+  },
+});
+
+module.exports = [Hk4KeySequence, Hk4KeySequenceArea];
