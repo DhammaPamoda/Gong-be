@@ -91,8 +91,6 @@ init_data_file() {
 
 init_data_file "coursesSchedule.json" "[]"
 init_data_file "archivedCoursesSchedule.json" "[]"
-init_data_file "manualGong.json" "[]"
-init_data_file "obsoleteManualGong.json" "[]"
 
 echo "Gong data directory ready: ${GONG_DATA_DIR}"
 
@@ -150,4 +148,3 @@ echo "=========================================="
 echo ""
 echo "Continuing server startup without FTDI support..."
 exit 0
-

@@ -48,13 +48,12 @@ The script does not copy the XDG runtime data directory. The following applicati
 
 - `~/.local/share/gong/{dev-or-prod}/coursesSchedule.json`
 - `~/.local/share/gong/{dev-or-prod}/archivedCoursesSchedule.json`
-- `~/.local/share/gong/{dev-or-prod}/manualGong.json`
-- `~/.local/share/gong/{dev-or-prod}/obsoleteManualGong.json`
+- `~/.local/share/gong/{dev-or-prod}/gong.sqlite` (including manual-gong data)
 - `~/.local/share/gong/{dev-or-prod}/systemSettings.json`
 - `~/.local/share/gong/{dev-or-prod}/hk4KeyMap.json`
 - `~/.local/share/gong/logs/ftdi_status.log`
 
-This is a backup coverage gap: active schedules, manual-gong history, system settings, and HK4 mappings are not protected by the repository's main backup script unless they are separately copied by an administrator.
+This is a backup coverage gap: active schedules, SQLite-backed manual-gong history, system settings, and HK4 mappings are not protected by the repository's main backup script unless they are separately copied by an administrator.
 
 ## When backups run
 
@@ -116,8 +115,7 @@ This protects the previous dev-ops script set, not the application data files.
 | User accounts | `assets/data/usersData.json` | Yes | Yes |
 | Active schedules | XDG data directory | No | No |
 | Archived schedules | XDG data directory | No | No |
-| Active manual gongs | XDG data directory | No | No |
-| Obsolete manual gongs | XDG data directory | No | No |
+| Active manual gongs | SQLite database in XDG data directory | No | No |
 | System settings | XDG data directory | No | No |
 | HK4 mappings | XDG data directory | No | No |
 | Server logs | `Gong-be/logs/` | No | No |

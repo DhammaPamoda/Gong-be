@@ -6,7 +6,8 @@ This document describes application data that is created, changed, or retained b
 
 | Storage | Purpose |
 | --- | --- |
-| `~/.local/share/gong/{dev-or-prod}/` | Dynamic schedules, manual gongs, and generated history. The path is defined in [lib/config/dataPaths.js](../lib/config/dataPaths.js). |
+| `~/.local/share/gong/{dev-or-prod}/` | Dynamic schedules and generated history. The path is defined in [lib/config/dataPaths.js](../lib/config/dataPaths.js). |
+| `~/.local/share/gong/{dev-or-prod}/gong.sqlite` | SQLite-backed runtime data, including manual gongs. |
 | `assets/data/staticData.json` | User-managed course templates, gong catalog metadata, and permission assignments. Agenda records contain area IDs. |
 | `~/.local/share/gong/{dev-or-prod}/systemSettings.json` | Runtime settings. The legacy file may also contain the alert module's area map. |
 | `assets/data/usersData.json` | User accounts and password hashes. |
@@ -90,7 +91,6 @@ A one-time gong scheduled directly by a user.
 
 ```text
 time: timestamp
-isActive: boolean
 gong: {
   gongType: number
   areas: number[]
@@ -107,11 +107,14 @@ The runtime classes are [model/manualGong.js](../model/manualGong.js) and [model
 | --- | --- | --- |
 | Create | Supported for future gongs. | `POST /api/data/gong/add` |
 | Read | Supported for active manual gongs. | `GET /api/data/gongs/list` |
-| Update | No general record edit. Active state is changed through the toggle operation. | `POST /api/data/gong/toggle` |
-| Delete | Supported; removal moves the record to obsolete history where applicable. | `POST /api/data/gong/remove` |
-| Expire/archive | Automatic when the scheduled time passes. | `manualGong.json` -> `obsoleteManualGong.json` |
+| Update | No general record edit. | N/A |
+| Delete | Supported; the record is deleted. | `POST /api/data/gong/remove` |
+| Expire | Automatic when the scheduled time passes. | Record is deleted from SQLite. |
 
-Active records are stored in `manualGong.json`. Expired/removed records are stored in `obsoleteManualGong.json` with `del_code: "O"`. There is no API to list, edit, or purge obsolete records.
+Manual gongs are stored in SQLite. `manual_gongs` holds the schedule, while
+`manual_gong_areas` holds its target areas. Expired or removed records are deleted;
+there is no retained manual-gong history.
+The legacy JSON import preserves no array-position field; SQLite `id` is the record identity.
 
 ## 4. Gong type and audio asset
 

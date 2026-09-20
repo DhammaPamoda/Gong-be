@@ -25,14 +25,10 @@ const ManualGong = new EntitySchema({
   tableName: 'manual_gongs',
   columns: {
     id: { type: Number, primary: true, generated: true },
-    sourceIndex: { type: Number },
     time: { type: String },
-    isActive: { type: Boolean, default: true },
     gongTypeId: { type: Number },
     volume: { type: Number, nullable: true },
     repeat: { type: Number, nullable: true },
-    state: { type: String, default: 'active' },
-    delCode: { type: String, nullable: true },
   },
   relations: {
     gongType: {

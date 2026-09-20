@@ -56,7 +56,7 @@ databaseReady.then(async () => {
   scheduleManager.start();
   scheduleManager.setExecutor(relayAndSoundManager.playGongForJob);
   gongsManager.addOnGongActionListener(scheduleManager.jobActionFunction.bind(scheduleManager));
-  gongsManager.init();
+  await gongsManager.init();
   oref.init();
 
   server.listen(PORT, () => {

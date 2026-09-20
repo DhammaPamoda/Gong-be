@@ -74,7 +74,6 @@ function sourceFiles(options) {
     activeSchedules: path.join(options.dataDirectory, 'coursesSchedule.json'),
     archivedSchedules: path.join(options.dataDirectory, 'archivedCoursesSchedule.json'),
     manualGongs: path.join(options.dataDirectory, 'manualGong.json'),
-    obsoleteManualGongs: path.join(options.dataDirectory, 'obsoleteManualGong.json'),
   };
 }
 
@@ -93,7 +92,6 @@ function loadSourceData(files) {
     activeSchedules: asArray(readJson(files.activeSchedules, [])),
     archivedSchedules: asArray(readJson(files.archivedSchedules, [])),
     manualGongs: asArray(readJson(files.manualGongs, [])),
-    obsoleteManualGongs: asArray(readJson(files.obsoleteManualGongs, [])),
   };
 
   const areaNames = new Map(Object.entries(systemSettings.areas || {}).map(([id, name]) => [
@@ -104,7 +102,7 @@ function loadSourceData(files) {
   sourceData.courses.forEach(course => (course.course_agenda || []).forEach((agenda) => {
     (agenda.gongs && agenda.gongs.areas || []).forEach(areaId => referencedAreaIds.add(Number(areaId)));
   }));
-  [...sourceData.manualGongs, ...sourceData.obsoleteManualGongs].forEach((record) => {
+  sourceData.manualGongs.forEach((record) => {
     (record.gong && record.gong.areas || []).forEach(areaId => referencedAreaIds.add(Number(areaId)));
   });
   Object.values(hk4KeyMap.sequences || {}).forEach((sequence) => {
@@ -128,7 +126,6 @@ function countSourceData(sourceData) {
     activeSchedules: sourceData.activeSchedules.length,
     archivedSchedules: sourceData.archivedSchedules.length,
     manualGongs: sourceData.manualGongs.length,
-    obsoleteManualGongs: sourceData.obsoleteManualGongs.length,
   };
 }
 
@@ -296,29 +293,20 @@ async function migrate(options, sourceData) {
         }
       }
 
-      for (const [state, gongs] of [
-        ['active', sourceData.manualGongs],
-        ['obsolete', sourceData.obsoleteManualGongs],
-      ]) {
-        for (const [sourceIndex, record] of gongs.entries()) {
-          const gongResult = await manager.insert('manual_gongs', {
-            sourceIndex,
-            time: String(record.time),
-            isActive: record.isActive !== false,
-            gongTypeId: Number(record.gong && record.gong.gongType),
-            volume: asNullableNumber(record.gong && record.gong.volume),
-            repeat: asNullableNumber(record.gong && record.gong.repeat),
-            state,
-            delCode: record.del_code || null,
-          });
-          const manualGongId = gongResult.identifiers[0].id;
-          const areas = asArray(record.gong && record.gong.areas);
-          if (areas.length > 0) {
-            await manager.insert('manual_gong_areas', areas.map(areaId => ({
-              manualGongId,
-              areaId: Number(areaId),
-            })));
-          }
+      for (const record of sourceData.manualGongs) {
+        const gongResult = await manager.insert('manual_gongs', {
+          time: String(record.time),
+          gongTypeId: Number(record.gong && record.gong.gongType),
+          volume: asNullableNumber(record.gong && record.gong.volume),
+          repeat: asNullableNumber(record.gong && record.gong.repeat),
+        });
+        const manualGongId = gongResult.identifiers[0].id;
+        const areas = asArray(record.gong && record.gong.areas);
+        if (areas.length > 0) {
+          await manager.insert('manual_gong_areas', areas.map(areaId => ({
+            manualGongId,
+            areaId: Number(areaId),
+          })));
         }
       }
     });
