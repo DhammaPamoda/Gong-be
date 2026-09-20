@@ -82,13 +82,10 @@ function loadSourceData(files) {
   const staticData = readJson(files.staticData, {});
   const systemSettings = readJson(files.systemSettings, {});
   const hk4KeyMap = readJson(files.hk4KeyMap, {});
-  return {
+  const sourceData = {
     systemSettings,
     hk4KeyMap,
-    areas: Object.entries(systemSettings.areas || {}).map(([id, name]) => ({
-      id: Number(id),
-      name: String(name),
-    })),
+    areas: [],
     gongTypes: asArray(staticData.gongTypes),
     courses: asArray(staticData.courses),
     permissions: asArray(staticData.permissions),
@@ -98,6 +95,27 @@ function loadSourceData(files) {
     manualGongs: asArray(readJson(files.manualGongs, [])),
     obsoleteManualGongs: asArray(readJson(files.obsoleteManualGongs, [])),
   };
+
+  const areaNames = new Map(Object.entries(systemSettings.areas || {}).map(([id, name]) => [
+    Number(id),
+    String(name),
+  ]));
+  const referencedAreaIds = new Set(areaNames.keys());
+  sourceData.courses.forEach(course => (course.course_agenda || []).forEach((agenda) => {
+    (agenda.gongs && agenda.gongs.areas || []).forEach(areaId => referencedAreaIds.add(Number(areaId)));
+  }));
+  [...sourceData.manualGongs, ...sourceData.obsoleteManualGongs].forEach((record) => {
+    (record.gong && record.gong.areas || []).forEach(areaId => referencedAreaIds.add(Number(areaId)));
+  });
+  Object.values(hk4KeyMap.sequences || {}).forEach((sequence) => {
+    (sequence.areas || []).forEach(areaId => referencedAreaIds.add(Number(areaId)));
+  });
+  sourceData.areas = [...referencedAreaIds].sort((a, b) => a - b).map(id => ({
+    id,
+    name: areaNames.get(id) || `Unknown Area (${id})`,
+  }));
+
+  return sourceData;
 }
 
 function countSourceData(sourceData) {
