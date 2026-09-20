@@ -17,18 +17,18 @@ const dataSource = new DataSource({
   synchronize: false,
 });
 
-let initializationPromise;
+let connectionPromise;
 
-function initializeDatabase() {
-  if (!initializationPromise) {
-    initializationPromise = dataSource.initialize();
+function connectDatabase() {
+  if (!connectionPromise) {
+    connectionPromise = dataSource.initialize();
   }
-  return initializationPromise;
+  return connectionPromise;
 }
 
 async function getDatabase() {
   if (!dataSource.isInitialized) {
-    await initializeDatabase();
+    await connectDatabase();
   }
   return dataSource;
 }
@@ -36,6 +36,6 @@ async function getDatabase() {
 module.exports = {
   dataSource,
   dataDirectory,
-  initializeDatabase,
+  connectDatabase,
   getDatabase,
 };

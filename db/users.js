@@ -19,6 +19,9 @@ const UserAccount = new EntitySchema({
     creationDate: { type: 'bigint', nullable: true },
     updateDate: { type: 'bigint', nullable: true },
     encodedPasswd: { type: String },
+    tokenSecret: { type: String, nullable: true },
+    accessTokenHash: { type: String, nullable: true },
+    accessTokenExpiresAt: { type: 'bigint', nullable: true },
   },
 });
 

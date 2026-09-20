@@ -7,7 +7,7 @@ const app = require('./app');
 // const db = require('../lib/db');
 const logger = require('../lib/logger');
 const dataPaths = require('../lib/config/dataPaths');
-const { initializeDatabase } = require('../db/dataSource');
+const { connectDatabase } = require('../db/dataSource');
 const systemSettingsManager = require('../lib/systemSettingsManager');
 const hk4Manager = require('../lib/hk4Manager');
 
@@ -32,7 +32,7 @@ if (!initResult.success) {
   }
 }
 
-const databaseReady = initializeDatabase();
+const databaseReady = connectDatabase();
 
 const server = USE_HTTPS ? https.createServer({
   key: fs.readFileSync('certs/server.key'),

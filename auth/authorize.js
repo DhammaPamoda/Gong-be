@@ -1,24 +1,26 @@
 const { expressjwt: expressJwt } = require('express-jwt');
-const moment = require('moment');
 
-const utilsManager = require('../lib/utilsManager');
+const usersDal = require('../db/dal/usersDal');
 const responder = require('../lib/responder');
+const hashAccessToken = require('./tokenHash');
 
-const secretCallback = (req, token) => {
-  return new Promise((resolve, reject) => {
-    const payload = token.payload;
-    const { sub } = payload;
-    if (sub) {
-      const authUser = utilsManager.usersMap.get(sub.toLowerCase());
-      if (authUser && authUser.tokenSecret) {
-        resolve(authUser.tokenSecret);
-        return;
-      }
+const secretCallback = async (req, token) => {
+  const { sub } = token.payload;
+  const authorization = req.headers.authorization || '';
+  const accessToken = authorization.startsWith('Bearer ')
+    ? authorization.substring('Bearer '.length)
+    : null;
+  if (sub && accessToken) {
+    const authUser = await usersDal.findById(sub.toLowerCase());
+    if (authUser && authUser.accessTokenExpiresAt && authUser.accessTokenExpiresAt <= Date.now()) {
+      await usersDal.clearAccessToken(authUser.id);
+    } else if (authUser && authUser.tokenSecret && authUser.accessTokenHash
+      && hashAccessToken(accessToken) === authUser.accessTokenHash) {
+      return authUser.tokenSecret;
     }
-    reject(new Error('missing_secret'));
-  });
+  }
+  throw new Error('missing_secret');
 };
-
 
 function authorize(roles = []) {
   let rolesArray = roles;
@@ -56,8 +58,8 @@ function authorize(roles = []) {
           '/loginPage',
           '/mainPage',
           '/favicon.ico',
-          /^\/\.well-known\/.*/,  // Chrome DevTools and other well-known paths
-        ]
+          /^\/\.well-known\/.*/, // Chrome DevTools and other well-known paths
+        ],
       }),
 
     // authorize based on user role

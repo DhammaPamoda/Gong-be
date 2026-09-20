@@ -1,13 +1,15 @@
 const fs = require('fs');
 const { IncomingForm } = require('formidable');
-const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
 const responder = require('../../lib/responder');
 const gongsManager = require('../../lib/gongsManager');
 const persistManager = require('../../lib/persist/persistManager');
-const utilsManager = require('../../lib/utilsManager');
 const logger = require('../../lib//logger');
 const dataPaths = require('../../lib/config/dataPaths');
+const permissionsDal = require('../../db/dal/permissionsDal');
+const usersDal = require('../../db/dal/usersDal');
+const User = require('../../model/user');
 const oref = require('../../lib/oref');
 const {
   EMERGENCY_ACTIVE,
@@ -17,9 +19,10 @@ const {
 
 const NO_OF_PORTS = process.env.NO_OF_PORTS ? Number.parseInt(process.env.NO_OF_PORTS, 10) : 4;
 
-function getStaticData(req, res, next) {
+async function getStaticData(req, res, next) {
   let rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
   const staticData = JSON.parse(rawData.toString());
+  staticData.permissions = await permissionsDal.getAll();
 
   if (staticData.areas) {
     staticData.areas = staticData.areas.filter((value, index) => index <= NO_OF_PORTS);
@@ -46,10 +49,15 @@ const getManualGongsList = (req, res, next) => {
   responder.send200Response(res, retList);
 };
 
-const getUsersList = (req, res, next) => {
-  const authorization = req.headers.authorization.split(' ')[1];
-  const { sub } = jwt.decode(authorization);
-  const retUsersList = utilsManager.getUsers(sub);
+const getUsersList = async (req, res, next) => {
+  const usersData = await usersDal.getAll();
+  const askingUser = req.user.sub;
+  const retUsersList = usersData.map((userData) => {
+    const user = User.fromDatabase(userData).toApi();
+    return askingUser === 'dev' || user.id !== 'dev'
+      ? _.omit(user, ['encodedPasswd'])
+      : user;
+  });
   responder.send200Response(res, retUsersList);
 };
 
