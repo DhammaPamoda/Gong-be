@@ -1,4 +1,3 @@
-const fs = require('fs');
 const moment = require('moment');
 const gongsManager = require('../lib/gongsManager');
 const logger = require('../lib/logger');
@@ -12,11 +11,6 @@ const jobActionStubFunction = jest.fn((/* Job */aJobOrJobs, aAction) => {
 
 describe('Test gongsManager - Handling Manual Gongs', () => {
   beforeAll(() => {
-    const filesPath = 'jest/data/1';
-    fs.writeFileSync(`${filesPath}/obsoleteManualGong.json`, '[]');
-    fs.writeFileSync(`${filesPath}/manualGong.json`, '[]');
-    fs.writeFileSync(`${filesPath}/coursesSchedule.json`, '[]');
-    gongsManager.setDynamicJsonFilesPath(filesPath);
     gongsManager.addOnGongActionListener(jobActionStubFunction);
     gongsManager.init();
   });

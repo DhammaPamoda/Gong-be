@@ -76,22 +76,6 @@ if [ ! -d "${GONG_DATA_DIR}" ]; then
     mkdir -p "${GONG_DATA_DIR}"
 fi
 
-# Initialize dynamic data files if they don't exist
-# These files are writable by the application at runtime
-init_data_file() {
-    local filename="$1"
-    local default_content="$2"
-    local filepath="${GONG_DATA_DIR}/${filename}"
-    
-    if [ ! -f "${filepath}" ]; then
-        echo "Initializing ${filename}..."
-        echo "${default_content}" > "${filepath}"
-    fi
-}
-
-init_data_file "coursesSchedule.json" "[]"
-init_data_file "archivedCoursesSchedule.json" "[]"
-
 echo "Gong data directory ready: ${GONG_DATA_DIR}"
 
 CACHE_DIR="${HOME}/.cache/ftdi-d2xx"

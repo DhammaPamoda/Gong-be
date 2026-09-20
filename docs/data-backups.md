@@ -34,10 +34,6 @@ The copied `assets/` directory contains the file-backed data stored there, inclu
   - Permission assignments
   - Area definitions
   - Static-data update timestamp
-- `assets/data/usersData.json`
-  - User IDs and roles
-  - Creation/update timestamps
-  - Bcrypt password hashes
 - `assets/sounds/`
   - Uploaded gong audio files
 - Other asset files present in the deployed directory
@@ -46,11 +42,7 @@ The copied `assets/` directory contains the file-backed data stored there, inclu
 
 The script does not copy the XDG runtime data directory. The following application data is therefore outside this backup path:
 
-- `~/.local/share/gong/{dev-or-prod}/coursesSchedule.json`
-- `~/.local/share/gong/{dev-or-prod}/archivedCoursesSchedule.json`
 - `~/.local/share/gong/{dev-or-prod}/gong.sqlite` (including manual-gong data)
-- `~/.local/share/gong/{dev-or-prod}/systemSettings.json`
-- `~/.local/share/gong/{dev-or-prod}/hk4KeyMap.json`
 - `~/.local/share/gong/logs/ftdi_status.log`
 
 This is a backup coverage gap: active schedules, SQLite-backed manual-gong history, system settings, and HK4 mappings are not protected by the repository's main backup script unless they are separately copied by an administrator.
@@ -78,7 +70,7 @@ The backup happens after the service is stopped, so the copied asset files shoul
 
 After copying the assets, it scans `dev_ops/patches/*.sh` in version order. A patch is run only when its marker is absent from `dev_ops/patches_installed/`; the script then creates that marker.
 
-Restore therefore recovers users, course templates, gong metadata, and audio files, but it does not recover the XDG dynamic JSON files listed above.
+Restore recovers course templates, gong metadata, and audio files, but not the SQLite database.
 
 ## Log rotation
 
@@ -112,12 +104,11 @@ This protects the previous dev-ops script set, not the application data files.
 | Course templates | `assets/data/staticData.json` | Yes | Yes |
 | Gong metadata | `assets/data/staticData.json` | Yes | Yes |
 | Uploaded gong audio | `assets/sounds/` | Yes | Yes |
-| User accounts | `assets/data/usersData.json` | Yes | Yes |
-| Active schedules | XDG data directory | No | No |
-| Archived schedules | XDG data directory | No | No |
-| Active manual gongs | SQLite database in XDG data directory | No | No |
-| System settings | XDG data directory | No | No |
-| HK4 mappings | XDG data directory | No | No |
+| User accounts | SQLite database in XDG data directory | No | No |
+| Schedules | SQLite database in XDG data directory | No | No |
+| Manual gongs | SQLite database in XDG data directory | No | No |
+| System settings | SQLite database in XDG data directory | No | No |
+| HK4 mappings | SQLite database in XDG data directory | No | No |
 | Server logs | `Gong-be/logs/` | No | No |
 | FTDI status log | XDG log directory | No | No |
 | Dev-ops scripts | `gong_dev_ops/dev_ops/` | No | No; separately snapshotted by `refresh_dev_ops_actions.sh` |

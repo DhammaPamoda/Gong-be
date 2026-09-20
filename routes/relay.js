@@ -57,13 +57,6 @@ router.get('/diagnostics', (req, res) => {
     nodeEnv: process.env.NODE_ENV || 'development',
   };
 
-  // Data files status
-  const dataFilesStatus = {};
-  for (const file of dataPaths.DYNAMIC_DATA_FILES) {
-    const validation = dataPaths.validateJsonFile(dataPaths.getDataFilePath(file));
-    dataFilesStatus[file] = validation.valid ? 'OK' : validation.error;
-  }
-
   // Schedule info
   const nextJob = scheduleManager.getNextScheduledJob();
   const scheduleInfo = {
@@ -77,7 +70,6 @@ router.get('/diagnostics', (req, res) => {
   const diagnostics = {
     ...audioDiagnostics,
     server: serverHealth,
-    dataFiles: dataFilesStatus,
     dataDirectory: dataPaths.DATA_DIR,
     schedule: scheduleInfo,
   };

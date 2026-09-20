@@ -1,4 +1,3 @@
-const fs = require('fs');
 const moment = require('moment');
 const utilsManager = require('../lib/utilsManager');
 const gongsManager = require('../lib/gongsManager');
@@ -18,9 +17,6 @@ describe('Test gongsManager courses handling', () => {
   let courseDaysCount;
 
   beforeAll(() => {
-    const filesPath = 'jest/data/1';
-    fs.writeFileSync(`${filesPath}/coursesSchedule.json`, '[]');
-    gongsManager.setDynamicJsonFilesPath(filesPath);
     gongsManager.addOnGongActionListener(jobActionStubFunction);
     gongsManager.init();
     jobActionStubFunction.mockClear();

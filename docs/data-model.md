@@ -6,11 +6,8 @@ This document describes application data that is created, changed, or retained b
 
 | Storage | Purpose |
 | --- | --- |
-| `~/.local/share/gong/{dev-or-prod}/` | Dynamic schedules and generated history. The path is defined in [lib/config/dataPaths.js](../lib/config/dataPaths.js). |
-| `~/.local/share/gong/{dev-or-prod}/gong.sqlite` | SQLite-backed runtime data, including manual gongs. |
-| `assets/data/staticData.json` | User-managed course templates, gong catalog metadata, and permission assignments. Agenda records contain area IDs. |
-| `~/.local/share/gong/{dev-or-prod}/systemSettings.json` | Legacy source for runtime settings. Area names are migrated into SQLite `areas`. |
-| `assets/data/usersData.json` | User accounts and password hashes. |
+| `~/.local/share/gong/{dev-or-prod}/gong.sqlite` | SQLite-backed runtime and user-managed data. |
+| `assets/data/staticData.json` | User-managed course templates and gong catalog metadata. Agenda records contain area IDs. |
 | `assets/sounds/` | Uploaded gong audio files. |
 | `logs/` and `~/.local/share/gong/logs/` | Operational and hardware diagnostics. |
 | Browser IndexedDB/localStorage | Frontend cache, authentication token, and user preferences. |
@@ -166,7 +163,7 @@ encodedPasswd: string     // bcrypt hash; never a plaintext password
 | Update password | Supported through password reset/update flow; password is re-hashed. | `POST /api/data/user/resetPassword` |
 | Delete | Supported by user id. | `POST /api/data/user/remove` |
 
-Records are stored in `assets/data/usersData.json` and reloaded into the in-memory user map after mutations. The separate `/users` routes are legacy/demo-style handlers and are not the main persistence API.
+Records are stored in SQLite. The separate `/users` routes are legacy/demo-style handlers and are not the main persistence API.
 
 ## 6. Permission assignment
 
@@ -203,7 +200,7 @@ name: string
 translation?: string
 ```
 
-Area definitions are stored in `systemSettings.json` as an object whose keys are area IDs and whose values are names, for example `{ "0": "all" }`. Course agenda records in `staticData.json` and gong records reference those IDs. The frontend represents areas with [src/app/model/area.ts](../../Gong_fe/src/app/model/area.ts).
+Area definitions are stored in SQLite. Course agenda records in `staticData.json` and gong records reference those IDs. The frontend represents areas with [src/app/model/area.ts](../../Gong_fe/src/app/model/area.ts).
 
 ### Storage and CRUD
 
@@ -240,7 +237,7 @@ The sequence key is the four-key input, such as `"1111"`. Each sequence referenc
 
 | Operation | Support | Implementation |
 | --- | --- | --- |
-| Create | The file is initialized with defaults when missing. Individual sequences are created by saving the full map. | `dataPaths.initializeDataFiles`; `POST /api/hk4` |
+| Create | Individual sequences are created by saving the full map. | `POST /api/hk4` |
 | Read | Supported. | `GET /api/hk4` |
 | Update | Supported by replacing the settings document or changing `enabled` through the status endpoint. | `POST /api/hk4`; `POST /api/hk4/status` |
 | Delete | Individual sequences can be removed by saving a map without them. There is no dedicated delete endpoint. | Frontend HK4 configuration |
@@ -285,10 +282,10 @@ Course agendas and gong records store area IDs as numeric references. The legacy
 
 | Operation | Support | Implementation |
 | --- | --- | --- |
-| Create | The file is initialized with defaults when missing. | `dataPaths.initializeDataFiles` |
-| Read | Supported. The backend loads the file at startup and returns the current settings. | `GET /api/systemSettings` |
-| Update | Supported as a shallow merge of the submitted fields. The file is atomically rewritten and a `settingsUpdated` event is emitted. | `POST /api/systemSettings`; [lib/systemSettingsManager.js](../lib/systemSettingsManager.js) |
-| Delete | Not supported. Individual fields or the whole file are not deleted through the API. | None |
+| Create | Initialized in SQLite. | Server startup |
+| Read | Supported. The backend loads the database settings at startup and returns the current settings. | `GET /api/systemSettings` |
+| Update | Supported as a shallow merge of submitted fields and emits `settingsUpdated`. | `POST /api/systemSettings`; [lib/systemSettingsManager.js](../lib/systemSettingsManager.js) |
+| Delete | Not supported. | None |
 
 ### Runtime consumers
 
@@ -366,7 +363,7 @@ These entities exist while the server is running but do not have independent CRU
 
 - **Scheduled job**: `data`, `time`, `isManual`, `status`, and callback; represented by [model/job.js](../model/job.js).
 - **Automatic gong job**: generated from a scheduled course and held in `automaticGongsMap`.
-- **In-memory maps**: courses, gong types, users, schedules, and manual gongs reconstructed from files.
+- **In-memory maps**: courses, gong types, schedules, and manual gongs reconstructed from SQLite or static data.
 - **Emergency state**: current alert category/time and active state from Oref or test-emergency requests.
 - **Relay/audio playback state**: current audio process and relay status.
 
@@ -376,7 +373,6 @@ These support operational commands but have no durable create/read/update/delete
 
 These are application configuration rather than user/domain data:
 
-- `hk4KeyMap.json`
 - `config/default.json` and `config/production.json`
 - i18n translation files
 - deployment/build scripts

@@ -9,10 +9,7 @@ The Gong server stores its data in the following locations:
 | Production  | `~/.local/share/gong/prod/` |
 | Development | `~/.local/share/gong/dev/` |
 
-Each directory contains:
-- `coursesSchedule.json` - Active course schedules
-- `archivedCoursesSchedule.json` - Archived course schedules  
-- `gong.sqlite` - SQLite-backed manual gong data
+Each directory contains `gong.sqlite`, the SQLite-backed application database.
 
 Logs:
 - Application logs: `~/.local/share/gong/logs/`
