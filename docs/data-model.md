@@ -7,7 +7,7 @@ This document describes application data that is created, changed, or retained b
 | Storage | Purpose |
 | --- | --- |
 | `~/.local/share/gong/{dev-or-prod}/gong.sqlite` | SQLite-backed runtime and user-managed data. |
-| `assets/sounds/` | Uploaded gong audio files. |
+| `assets/sounds/` | Uploaded gong audio files; backed up alongside the SQLite snapshot. |
 | `logs/` and `~/.local/share/gong/logs/` | Operational and hardware diagnostics. |
 | Browser IndexedDB/localStorage | Frontend cache, authentication token, and user preferences. |
 
@@ -136,7 +136,7 @@ The model is [model/gongType.js](../model/gongType.js).
 | Update | Supported by uploading replacement audio with an existing `gongId`; metadata path is updated. | `POST /api/data/gong/upload` |
 | Delete | Supported; removes metadata and the corresponding audio file. | `POST /api/data/gong/deleteFile` |
 
-Metadata is stored in SQLite; binary audio is stored in `assets/sounds/`. The upload uses a temporary multipart file supplied by Formidable before copying it to the asset directory.
+Metadata is stored in SQLite; binary audio is stored in `assets/sounds/`. The upload uses a temporary multipart file supplied by Formidable before copying it to the asset directory. See [data backups](data-backups.md) and the [production migration runbook](production-sqlite-migration.md) for operational handling.
 
 ## 5. User account
 
