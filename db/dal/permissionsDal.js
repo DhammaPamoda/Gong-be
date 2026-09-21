@@ -11,8 +11,9 @@ async function updateAll(permissions) {
   await database.transaction(async (manager) => {
     for (const permission of permissions) {
       await manager.update('permissions', permission.action, {
-        roles: permission.roles,
-        displayOrder: permission.order,
+      roles: permission.roles,
+      displayOrder: permission.order,
+      updatedAt: Date.now(),
       });
     }
   });

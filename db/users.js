@@ -7,6 +7,7 @@ const Permission = new EntitySchema({
     action: { type: String, primary: true },
     roles: { type: 'simple-json' },
     displayOrder: { type: Number, nullable: true },
+    updatedAt: { type: 'bigint' },
   },
 });
 

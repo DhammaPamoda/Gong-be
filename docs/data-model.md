@@ -7,7 +7,6 @@ This document describes application data that is created, changed, or retained b
 | Storage | Purpose |
 | --- | --- |
 | `~/.local/share/gong/{dev-or-prod}/gong.sqlite` | SQLite-backed runtime and user-managed data. |
-| `assets/data/staticData.json` | Legacy metadata containing only `lastUpdatedTime` while that field awaits its own refactor. |
 | `assets/sounds/` | Uploaded gong audio files. |
 | `logs/` and `~/.local/share/gong/logs/` | Operational and hardware diagnostics. |
 | Browser IndexedDB/localStorage | Frontend cache, authentication token, and user preferences. |

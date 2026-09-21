@@ -17,6 +17,7 @@ const GongType = new EntitySchema({
     id: { type: Number, primary: true },
     name: { type: String },
     pathName: { type: String },
+    updatedAt: { type: 'bigint' },
   },
 });
 

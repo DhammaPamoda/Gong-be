@@ -8,6 +8,7 @@ const CourseTemplate = new EntitySchema({
     name: { type: String, unique: true },
     daysCount: { type: Number },
     test: { type: Boolean, default: false },
+    updatedAt: { type: 'bigint' },
   },
 });
 

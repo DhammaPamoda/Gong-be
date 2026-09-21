@@ -47,6 +47,7 @@ async function addAll(courses) {
         name: course.course_name,
         daysCount: course.days_count,
         test: course.test === true,
+        updatedAt: Date.now(),
       });
       const courseTemplateId = templateResult.identifiers[0].id;
       for (const item of course.course_agenda) {

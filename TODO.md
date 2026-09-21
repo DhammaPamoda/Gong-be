@@ -4,7 +4,7 @@ This file tracks requested features and improvements that couldn't be logged as 
 
 ## Upload Mechanism Enhancements
 - [ ] **Gong Display Name**: Modify the `uploadGong` mechanism (frontend and backend) to allow users to specify a "Display Name" for the uploaded gong.
-    - **Backend**: Update `uploadGong` handler to accept a name field and store it in `staticData.json`.
+    - **Backend**: Update `uploadGong` handler to accept a name field and store it in SQLite.
     - **Frontend**: Add an input field to the upload dialog for the gong name.
     - **UI**: Ensure the display name is used in the manual and automatic activation lists, falling back to the filename if the name is not provided.
 

@@ -28,8 +28,6 @@ The script creates the timestamp using `YYYY_MM_DD_HH_MM_SS`. Before writing the
 
 The copied `assets/` directory contains the file-backed data stored there, including:
 
-- `assets/data/staticData.json`
-  - Legacy `lastUpdatedTime` metadata only
 - `assets/sounds/`
   - Uploaded gong audio files
 - Other asset files present in the deployed directory

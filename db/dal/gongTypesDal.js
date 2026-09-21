@@ -14,14 +14,14 @@ async function create(gongType) {
   const database = await getDatabase();
   const repository = database.getRepository('GongType');
   const lastGongType = await repository.findOne({ order: { id: 'DESC' } });
-  const record = { ...gongType, id: (lastGongType ? lastGongType.id : 0) + 1 };
+  const record = { ...gongType, id: (lastGongType ? lastGongType.id : 0) + 1, updatedAt: Date.now() };
   await repository.insert(record);
   return record;
 }
 
 async function update(id, values) {
   const database = await getDatabase();
-  await database.getRepository('GongType').update(id, values);
+  await database.getRepository('GongType').update(id, { ...values, updatedAt: Date.now() });
 }
 
 async function remove(id) {

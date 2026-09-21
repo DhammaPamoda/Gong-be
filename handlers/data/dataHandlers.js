@@ -6,12 +6,12 @@ const responder = require('../../lib/responder');
 const gongsManager = require('../../lib/gongsManager');
 const persistManager = require('../../lib/persist/persistManager');
 const logger = require('../../lib//logger');
-const dataPaths = require('../../lib/config/dataPaths');
 const permissionsDal = require('../../db/dal/permissionsDal');
 const usersDal = require('../../db/dal/usersDal');
 const scheduledCoursesDal = require('../../db/dal/scheduledCoursesDal');
 const courseTemplatesDal = require('../../db/dal/courseTemplatesDal');
 const gongTypesDal = require('../../db/dal/gongTypesDal');
+const dataFreshnessDal = require('../../db/dal/dataFreshnessDal');
 const User = require('../../model/user');
 const oref = require('../../lib/oref');
 const {
@@ -21,9 +21,8 @@ const {
 } = require('../../model/israel/activeAlertCategories');
 
 async function getStaticData(req, res, next) {
-  const rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
-  const { lastUpdatedTime } = JSON.parse(rawData.toString());
-  const [courses, gongTypes, permissions] = await Promise.all([
+  const [lastUpdatedTime, courses, gongTypes, permissions] = await Promise.all([
+    dataFreshnessDal.getLastUpdatedTime(),
     courseTemplatesDal.getAll(),
     gongTypesDal.getAll(),
     permissionsDal.getAll(),

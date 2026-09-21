@@ -82,6 +82,7 @@ function loadSourceData(files) {
   const systemSettings = readJson(files.systemSettings, {});
   const hk4KeyMap = readJson(files.hk4KeyMap, {});
   const sourceData = {
+    lastUpdatedTime: Number(staticData.lastUpdatedTime || Date.now()),
     systemSettings,
     hk4KeyMap,
     areas: [],
@@ -172,6 +173,7 @@ async function migrate(options, sourceData) {
         id: Number(gongType.id),
         name: gongType.name,
         pathName: gongType.pathName,
+        updatedAt: sourceData.lastUpdatedTime,
       })));
 
       await manager.insert('system_settings', {
@@ -208,6 +210,7 @@ async function migrate(options, sourceData) {
           name: course.course_name,
           daysCount: Number(course.days_count),
           test: course.test === true,
+          updatedAt: sourceData.lastUpdatedTime,
         });
         const courseTemplateId = templateResult.identifiers[0].id;
         const agenda = asArray(course.course_agenda);
@@ -249,6 +252,7 @@ async function migrate(options, sourceData) {
         action: permission.action,
         roles: asArray(permission.roles),
         displayOrder: asNullableNumber(permission.order),
+        updatedAt: sourceData.lastUpdatedTime,
       })));
 
       await manager.insert('users', sourceData.users.map(user => ({
