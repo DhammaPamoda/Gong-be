@@ -5,6 +5,7 @@
     "lint": "eslint server lib routes",
     "lint:fix": "npm run lint -- --fix",
     "test": "jest",
+    "bootstrap-db": "node scripts/bootstrap-db.js",
     "prestart": "./dev_ops/prestart_init.sh",
     "start": "NO_OF_PORTS=8 NODE_ENV=development babel-node server",
     "prestart-https": "./dev_ops/prestart_init.sh",

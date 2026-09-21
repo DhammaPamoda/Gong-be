@@ -8,7 +8,14 @@ const CourseTemplate = new EntitySchema({
     name: { type: String, unique: true },
     daysCount: { type: Number },
     test: { type: Boolean, default: false },
-    updatedAt: { type: 'bigint' },
+    updatedAt: { type: 'bigint', nullable: true },
+  },
+  relations: {
+    agenda: {
+      type: 'one-to-many',
+      target: 'CourseTemplateAgenda',
+      inverseSide: 'courseTemplate',
+    },
   },
 });
 
