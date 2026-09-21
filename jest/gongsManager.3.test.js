@@ -1,5 +1,4 @@
 const moment = require('moment');
-const utilsManager = require('../lib/utilsManager');
 const gongsManager = require('../lib/gongsManager');
 const logger = require('../lib/logger');
 

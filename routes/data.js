@@ -9,8 +9,6 @@ router.get('/staticData', dataHandlers.getStaticData);
 
 router.get('/coursesSchedule', dataHandlers.getCoursesSchedule);
 
-router.get('/course/:id', dataHandlers.getCourseByName);
-
 router.get('/gongs/list', dataHandlers.getManualGongsList);
 
 router.get('/users/list', dataHandlers.getUsersList);

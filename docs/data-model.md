@@ -7,7 +7,7 @@ This document describes application data that is created, changed, or retained b
 | Storage | Purpose |
 | --- | --- |
 | `~/.local/share/gong/{dev-or-prod}/gong.sqlite` | SQLite-backed runtime and user-managed data. |
-| `assets/data/staticData.json` | User-managed course templates and gong catalog metadata. Agenda records contain area IDs. |
+| `assets/data/staticData.json` | Legacy metadata containing only `lastUpdatedTime` while that field awaits its own refactor. |
 | `assets/sounds/` | Uploaded gong audio files. |
 | `logs/` and `~/.local/share/gong/logs/` | Operational and hardware diagnostics. |
 | Browser IndexedDB/localStorage | Frontend cache, authentication token, and user preferences. |
@@ -38,18 +38,18 @@ days_count: number
  }]
 ```
 
-The runtime model is represented by [model/course.js](../model/course.js) and loaded into `utilsManager.coursesMap`.
+The runtime model is represented by [model/course.js](../model/course.js) and constructed from SQLite course-template records when scheduling.
 
 ### Storage and CRUD
 
 | Operation | Support | Implementation |
 | --- | --- | --- |
 | Create | Supported; accepts an uploaded JSON array of templates. | `POST /api/data/course/uploadCourses`; [handlers/data/dataHandlers.js](../handlers/data/dataHandlers.js), [lib/persist/persistManager.js](../lib/persist/persistManager.js) |
-| Read | Supported through all static data and an intended per-course endpoint. | `GET /api/data/staticData`; `GET /api/data/course/:id` |
+| Read | Supported through static-data response composed from SQLite. | `GET /api/data/staticData` |
 | Update | No direct update. Re-uploading is rejected when the course name already exists. | Validation in [lib/persist/persistManager.js](../lib/persist/persistManager.js) |
 | Delete | Supported by course name. | `POST /api/data/course/remove` |
 
-The per-course handler reads `req.params.name` while the route declares `:id`; that detail endpoint should be treated as defective until corrected.
+Course templates and agendas are stored in SQLite and returned through the static-data response.
 
 ## 2. Scheduled course
 
@@ -137,7 +137,7 @@ The model is [model/gongType.js](../model/gongType.js).
 | Update | Supported by uploading replacement audio with an existing `gongId`; metadata path is updated. | `POST /api/data/gong/upload` |
 | Delete | Supported; removes metadata and the corresponding audio file. | `POST /api/data/gong/deleteFile` |
 
-Metadata is stored in `assets/data/staticData.json`; binary audio is stored in `assets/sounds/`. The upload uses a temporary multipart file supplied by Formidable before copying it to the asset directory.
+Metadata is stored in SQLite; binary audio is stored in `assets/sounds/`. The upload uses a temporary multipart file supplied by Formidable before copying it to the asset directory.
 
 ## 5. User account
 
@@ -186,7 +186,7 @@ order: number
 | Update | Supported for the role list of existing actions. | `POST /api/data/permissions/update` |
 | Delete | Not supported. | None |
 
-Permission assignments are stored inside `assets/data/staticData.json`.
+Permission assignments are stored in SQLite.
 
 ## 7. Area
 
@@ -200,7 +200,7 @@ name: string
 translation?: string
 ```
 
-Area definitions are stored in SQLite. Course agenda records in `staticData.json` and gong records reference those IDs. The frontend represents areas with [src/app/model/area.ts](../../Gong_fe/src/app/model/area.ts).
+Area definitions are stored in SQLite. Course agendas and gong records reference those IDs. The frontend represents areas with [src/app/model/area.ts](../../Gong_fe/src/app/model/area.ts).
 
 ### Storage and CRUD
 

@@ -29,11 +29,7 @@ The script creates the timestamp using `YYYY_MM_DD_HH_MM_SS`. Before writing the
 The copied `assets/` directory contains the file-backed data stored there, including:
 
 - `assets/data/staticData.json`
-  - Course templates
-  - Gong type metadata
-  - Permission assignments
-  - Area definitions
-  - Static-data update timestamp
+  - Legacy `lastUpdatedTime` metadata only
 - `assets/sounds/`
   - Uploaded gong audio files
 - Other asset files present in the deployed directory
@@ -101,8 +97,8 @@ This protects the previous dev-ops script set, not the application data files.
 
 | Data | Primary location | Included in `backup_files.sh` | Restored by `restore_files.sh` |
 | --- | --- | --- | --- |
-| Course templates | `assets/data/staticData.json` | Yes | Yes |
-| Gong metadata | `assets/data/staticData.json` | Yes | Yes |
+| Course templates | SQLite database in XDG data directory | No | No |
+| Gong metadata | SQLite database in XDG data directory | No | No |
 | Uploaded gong audio | `assets/sounds/` | Yes | Yes |
 | User accounts | SQLite database in XDG data directory | No | No |
 | Schedules | SQLite database in XDG data directory | No | No |

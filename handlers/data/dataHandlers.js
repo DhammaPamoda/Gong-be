@@ -10,6 +10,8 @@ const dataPaths = require('../../lib/config/dataPaths');
 const permissionsDal = require('../../db/dal/permissionsDal');
 const usersDal = require('../../db/dal/usersDal');
 const scheduledCoursesDal = require('../../db/dal/scheduledCoursesDal');
+const courseTemplatesDal = require('../../db/dal/courseTemplatesDal');
+const gongTypesDal = require('../../db/dal/gongTypesDal');
 const User = require('../../model/user');
 const oref = require('../../lib/oref');
 const {
@@ -18,29 +20,19 @@ const {
   EMERGENCY_PREPARE
 } = require('../../model/israel/activeAlertCategories');
 
-const NO_OF_PORTS = process.env.NO_OF_PORTS ? Number.parseInt(process.env.NO_OF_PORTS, 10) : 4;
-
 async function getStaticData(req, res, next) {
-  let rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
-  const staticData = JSON.parse(rawData.toString());
-  staticData.permissions = await permissionsDal.getAll();
-
-  if (staticData.areas) {
-    staticData.areas = staticData.areas.filter((value, index) => index <= NO_OF_PORTS);
-  }
-
-  responder.send200Response(res, staticData);
+  const rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
+  const { lastUpdatedTime } = JSON.parse(rawData.toString());
+  const [courses, gongTypes, permissions] = await Promise.all([
+    courseTemplatesDal.getAll(),
+    gongTypesDal.getAll(),
+    permissionsDal.getAll(),
+  ]);
+  responder.send200Response(res, { lastUpdatedTime, courses, gongTypes, permissions });
 }
 
 async function getCoursesSchedule(req, res, next) {
   responder.send200Response(res, await scheduledCoursesDal.getActive());
-}
-
-function getCourseByName(req, res, next) {
-  const courseName = req.params.name;
-  const rawData = fs.readFileSync(dataPaths.getStaticAssetPath(`course_${courseName}.json`));
-  const foundCourse = JSON.parse(rawData);
-  responder.send200Response(res, foundCourse);
 }
 
 const getManualGongsList = (req, res, next) => {
@@ -313,7 +305,6 @@ function checkAuth(req, res, next) {
 module.exports = {
   checkAuth,
   getStaticData,
-  getCourseByName,
   getCoursesSchedule,
   getManualGongsList,
   getEmergencyState,

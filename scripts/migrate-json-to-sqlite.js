@@ -207,6 +207,7 @@ async function migrate(options, sourceData) {
         const templateResult = await manager.insert('course_templates', {
           name: course.course_name,
           daysCount: Number(course.days_count),
+          test: course.test === true,
         });
         const courseTemplateId = templateResult.identifiers[0].id;
         const agenda = asArray(course.course_agenda);
