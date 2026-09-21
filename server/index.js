@@ -7,6 +7,9 @@ const app = require('./app');
 // const db = require('../lib/db');
 const logger = require('../lib/logger');
 const dataPaths = require('../lib/config/dataPaths');
+const { connectDatabase } = require('../db/dataSource');
+const systemSettingsManager = require('../lib/systemSettingsManager');
+const hk4Manager = require('../lib/hk4Manager');
 
 const scheduleManager = require('../lib/scheduleManager');
 const gongsManager = require('../lib/gongsManager');
@@ -16,18 +19,7 @@ const oref = require('../lib/oref');
 const PORT = config.get('server.port') || 3001;
 const USE_HTTPS = !!process.env.HTTPS;
 
-// Initialize data files on startup - ensure all required files exist and are valid
-const initResult = dataPaths.initializeDataFiles();
-if (!initResult.success) {
-  logger.log('error', `Failed to initialize data files: ${initResult.errors.join(', ')}`);
-} else {
-  if (initResult.initialized.length > 0) {
-    logger.log('info', `Created missing data files: ${initResult.initialized.join(', ')}`);
-  }
-  if (initResult.repaired.length > 0) {
-    logger.log('warn', `Repaired corrupted data files: ${initResult.repaired.join(', ')}`);
-  }
-}
+const databaseReady = connectDatabase();
 
 const server = USE_HTTPS ? https.createServer({
   key: fs.readFileSync('certs/server.key'),
@@ -44,29 +36,32 @@ server.on('connection', (conn) => {
   });
 });
 
-server.listen(PORT, () => {
-  exec('whoami', (err, stdout, stderr) => {
-    logger.log('info', '\n');
-    logger.log('info', `Server listening on port ${PORT} using ${USE_HTTPS ? 'https' : 'http'}`);
-    logger.log('info', 'Press CTRL-C to stop');
-    if (err !== null) {
-      logger.error('Failed to retrieve whoami\n', err);
-    } else {
-      logger.log('info', `Whomai = ${stdout}\n`);
-    }
+databaseReady.then(async () => {
+  await systemSettingsManager.initializeFromDatabase();
+  await hk4Manager.initializeFromDatabase();
+
+  scheduleManager.start();
+  scheduleManager.setExecutor(relayAndSoundManager.playGongForJob);
+  gongsManager.addOnGongActionListener(scheduleManager.jobActionFunction.bind(scheduleManager));
+  await gongsManager.init();
+  oref.init();
+
+  server.listen(PORT, () => {
+    exec('whoami', (err, stdout, stderr) => {
+      logger.log('info', '\n');
+      logger.log('info', `Server listening on port ${PORT} using ${USE_HTTPS ? 'https' : 'http'}`);
+      logger.log('info', 'Press CTRL-C to stop');
+      if (err !== null) {
+        logger.error('Failed to retrieve whoami\n', err);
+      } else {
+        logger.log('info', `Whomai = ${stdout}\n`);
+      }
+    });
   });
+}).catch((error) => {
+  logger.error('Failed to initialize SQLite database', { error });
+  process.exitCode = 1;
 });
-
-// db.connection.on('error', (err) => {
-//   logger.log('error', `connection error:${err}`);
-// });
-
-scheduleManager.start();
-scheduleManager.setExecutor(relayAndSoundManager.playGongForJob);
-
-gongsManager.addOnGongActionListener(scheduleManager.jobActionFunction.bind(scheduleManager));
-gongsManager.init();
-oref.init();
 
 // ==========================================
 // Startup Logging

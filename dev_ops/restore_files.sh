@@ -12,7 +12,13 @@ echo
 echo
 
 set -v
-sudo -S cp -rf  "/home/${USER}/projects/gong_backups/0_last_update/assets/"* "/home/${USER}/projects/gong_server/assets/"  <<< "${USER_PASS}"
+XDG_DATA_HOME="${XDG_DATA_HOME:-/home/${USER}/.local/share}"
+GONG_DATA_DIR="${XDG_DATA_HOME}/gong/prod"
+BACKUP_DIR="/home/${USER}/projects/gong_backups/0_last_update"
+sudo -S mkdir -p "${GONG_DATA_DIR}" <<< "${USER_PASS}"
+sudo -S cp "${BACKUP_DIR}/snapshot-gong.sqlite" "${GONG_DATA_DIR}/gong.sqlite" <<< "${USER_PASS}"
+sudo -S rm -rf "/home/${USER}/projects/gong_server/assets/sounds" <<< "${USER_PASS}"
+sudo -S cp -r "${BACKUP_DIR}/sounds" "/home/${USER}/projects/gong_server/assets/sounds" <<< "${USER_PASS}"
 
 DEV_OPS_DIR=/home/"${USER}"/projects/gong_dev_ops
 #DEV_OPS_DIR=~/WebstormProjects/vipassana/"${USER}"/dev_ops

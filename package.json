@@ -5,6 +5,7 @@
     "lint": "eslint server lib routes",
     "lint:fix": "npm run lint -- --fix",
     "test": "jest",
+    "bootstrap-db": "node scripts/bootstrap-db.js",
     "prestart": "./dev_ops/prestart_init.sh",
     "start": "NO_OF_PORTS=8 NODE_ENV=development babel-node server",
     "prestart-https": "./dev_ops/prestart_init.sh",
@@ -29,6 +30,7 @@
   "dependencies": {
     "@babel/runtime": "^7.25.0",
     "bcrypt": "^5.1.1",
+    "better-sqlite3": "^12.11.1",
     "body-parser": "^1.20.2",
     "config": "^3.3.11",
     "cors": "^2.8.5",
@@ -44,6 +46,7 @@
     "mongoose": "^8.7.0",
     "node-schedule": "^2.1.1",
     "play-sound": "^1.1.6",
+    "typeorm": "^1.1.1",
     "uuid": "^11.0.1",
     "winston": "^3.15.0"
   },

@@ -186,13 +186,6 @@ npm run build
 set +v
 echo -e "----------------------------------------------------------------------------------------------------"
 
-# Ensure data files exist in deployed gong_server (copy from templates if missing)
-GONG_SERVER_DATA="${BASE_DIR}/Gong-be/assets/data"
-if [ ! -f "${GONG_SERVER_DATA}/coursesSchedule.json" ] && [ -f "${GONG_SERVER_DATA}/coursesSchedule.example.json" ]; then
-    echo "Initializing coursesSchedule.json from template in gong_server..."
-    cp "${GONG_SERVER_DATA}/coursesSchedule.example.json" "${GONG_SERVER_DATA}/coursesSchedule.json"
-fi
-
 # Ensure all files in gong_server are owned by the current user
 # (Just in case any were previously created by root)
 echo "Ensuring correct ownership of ${BASE_DIR}/gong_server..."

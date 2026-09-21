@@ -78,7 +78,7 @@ XDG_DATA_HOME="${XDG_DATA_HOME:-/home/${USER}/.local/share}"
 GONG_DATA_DIR="${XDG_DATA_HOME}/gong"
 mkdir -p "${GONG_DATA_DIR}"
 
-# Note: Data files are initialized by the Node.js application (dataPaths.initializeDataFiles)
+# SQLite initializes its schema when the application starts.
 # which creates them in the correct prod/ or dev/ subdirectory based on NODE_ENV.
 # Do NOT create files here - they would be in the wrong location.
 

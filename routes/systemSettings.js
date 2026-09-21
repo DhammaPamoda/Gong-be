@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const systemSettingsManager = require('../lib/systemSettingsManager');
 
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const settings = systemSettingsManager.getSettings();
     res.json(settings);
@@ -12,11 +12,10 @@ router.get('/', (req, res, next) => {
   }
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
     const newSettings = req.body;
-    systemSettingsManager.updateSettings(newSettings);
-    res.json(systemSettingsManager.getSettings());
+    res.json(await systemSettingsManager.updateSettings(newSettings));
   } catch (error) {
     next(error);
   }

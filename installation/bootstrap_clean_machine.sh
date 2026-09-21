@@ -290,13 +290,6 @@ XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 GONG_DATA_DIR="${XDG_DATA_HOME}/gong"
 mkdir -p "${GONG_DATA_DIR}"
 
-# Initialize empty data files
-for file in coursesSchedule.json archivedCoursesSchedule.json manualGong.json obsoleteManualGong.json; do
-    if [ ! -f "${GONG_DATA_DIR}/${file}" ]; then
-        echo "[]" > "${GONG_DATA_DIR}/${file}"
-        echo "  Created: ${file}"
-    fi
-done
 echo "Gong data directory ready: ${GONG_DATA_DIR}"
 
 echo

@@ -1,6 +1,4 @@
-const fs = require('fs');
 const moment = require('moment');
-const utilsManager = require('../lib/utilsManager');
 const gongsManager = require('../lib/gongsManager');
 const logger = require('../lib/logger');
 
@@ -34,8 +32,6 @@ describe('Test gongsManager with Initial setup', () => {
       },
     }];
 
-    fs.writeFileSync(`${filesPath}/coursesSchedule.json`, JSON.stringify(coursesScheduleObject));
-    gongsManager.setDynamicJsonFilesPath(filesPath);
     gongsManager.addOnGongActionListener(jobActionStubFunction);
   });
 

@@ -2,7 +2,7 @@ require('@babel/register');
 const gongsManager = require('./lib/gongsManager');
 const scheduleManager = require('./lib/scheduleManager');
 const ExceptionGong = require('./model/exceptionGong');
-const utilsManager = require('./lib/utilsManager');
+const { getLocalOffsetDetailsFromTimestamp } = require('./lib/utils/time');
 const moment = require('moment');
 
 gongsManager.init();
@@ -23,7 +23,7 @@ setTimeout(() => {
   
   const futureGongTimeInMSec = timeOfCourseStart + exception.getTotalTimeInMsec() - startDay * 24 * 3600000;
   
-  const { rawMinutes: courseStartDateUtcOffsetInMinutes } = utilsManager.getLocalOffsetDetails(momentOfCourseStart._d);
+  const { rawMinutes: courseStartDateUtcOffsetInMinutes } = getLocalOffsetDetailsFromTimestamp(momentOfCourseStart.valueOf());
   const futureGongTimeUtcOffset = new Date(futureGongTimeInMSec).getTimezoneOffset();
   const offsetDifference = futureGongTimeUtcOffset - courseStartDateUtcOffsetInMinutes;
   const gongTime = futureGongTimeInMSec + (offsetDifference * 60000);
