@@ -9,6 +9,7 @@ const utilsManager = require('../../lib/utilsManager');
 const logger = require('../../lib//logger');
 const dataPaths = require('../../lib/config/dataPaths');
 const oref = require('../../lib/oref');
+const systemSettingsManager = require('../../lib/systemSettingsManager');
 const {
   EMERGENCY_ACTIVE,
   EMERGENCY_END,
@@ -21,7 +22,12 @@ function getStaticData(req, res, next) {
   let rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
   const staticData = JSON.parse(rawData.toString());
 
-  if (staticData.areas) {
+  const settings = systemSettingsManager.getSettings();
+  if (settings && settings.areas) {
+    staticData.areas = settings.areas;
+  }
+
+  if (staticData.areas && Array.isArray(staticData.areas)) {
     staticData.areas = staticData.areas.filter((value, index) => index <= NO_OF_PORTS);
   }
 
@@ -32,6 +38,12 @@ function getCoursesSchedule(req, res, next) {
   const rawData = fs.readFileSync(dataPaths.getDataFilePath('coursesSchedule.json'));
   const coursesSchedule = JSON.parse(rawData);
   responder.send200Response(res, coursesSchedule);
+}
+
+function getCourses(req, res, next) {
+  let rawData = fs.readFileSync(dataPaths.getStaticAssetPath('staticData.json'));
+  const {courses} = JSON.parse(rawData.toString());
+  responder.send200Response(res, courses);
 }
 
 function getCourseByName(req, res, next) {
@@ -250,6 +262,16 @@ async function updatePermissions(req, res, next) {
   }
 }
 
+async function updateCourseAgenda(req, res, next) {
+  try {
+    await persistManager.updateCourseAgenda(req.body);
+    responder.send200Response(res);
+  } catch (e) {
+    responder.sendErrorResponse(res, 500, 'Error in updateCourseAgenda ', e, req);
+    logger.error('updateCourseAgenda Failed', { error: e });
+  }
+}
+
 function getEmergencyState(req, res, next) {
   responder.send200Response(res, oref.getEmergencyState());
 }
@@ -306,6 +328,7 @@ function checkAuth(req, res, next) {
 module.exports = {
   checkAuth,
   getStaticData,
+  getCourses,
   getCourseByName,
   getCoursesSchedule,
   getManualGongsList,
@@ -327,6 +350,7 @@ module.exports = {
   updateUser,
   resetUserPassword,
   updatePermissions,
+  updateCourseAgenda,
   getEmergencyState,
   clearEmergencyState,
 };
