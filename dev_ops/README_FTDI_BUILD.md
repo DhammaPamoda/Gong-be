@@ -55,11 +55,10 @@ The script automatically detects the environment:
    - Base: Ubuntu 20.04 (GLIBC 2.31)
    - Node.js 18.x
    - Build tools (cmake, g++, make)
-   - FTDI D2XX libraries and headers
+   - Uses the FTDI D2XX static library and headers bundled with `ftdi-d2xx`
 
 2. **Builds Binary**: Runs container to compile `ftdi-d2xx.Linux.x86_64.node`
-   - Installs npm dependencies
-   - Runs `npm run cmake:rebuild-release`
+   - Runs `cmake-js rebuild` against the package's bundled source and library
 
 3. **Copies Binary**: Extracts compiled binary to host system
    - Location: `node_modules/ftdi-d2xx/build/Release/ftdi-d2xx.Linux.x86_64.node`
@@ -79,7 +78,7 @@ node -e "try { const FTDI = require('ftdi-d2xx'); console.log('✓ ftdi-d2xx loa
 ## Troubleshooting
 
 - **Docker permission denied**: Add user to docker group: `sudo usermod -aG docker $USER`
-- **Build fails**: Check Docker logs and ensure FTDI D2XX libraries are accessible in container
+- **Build fails**: Check Docker logs and ensure the `ftdi-d2xx` package includes its Linux library and headers
 - **Binary not found**: Verify the build completed successfully and check `node_modules/ftdi-d2xx/build/Release/`
 
 ## Kernel Module Handling (Development Environment)
@@ -123,4 +122,3 @@ sudo modprobe ftdi_sio
 - The binary is built for x86_64 architecture with GLIBC 2.31 compatibility
 - Original pre-compiled binary (GLIBC 2.33) is replaced with the container-built version
 - Kernel module unloading requires sudo privileges; the script will show a note if it cannot unload
-

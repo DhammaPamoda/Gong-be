@@ -72,12 +72,13 @@ mkdir -p "${TARGET_DIR}"
 # Run container to build the binary
 echo "Building ftdi-d2xx binary in container..."
 ${DOCKER_CMD} run --name ${CONTAINER_NAME} \
+    --user "$(id -u):$(id -g)" \
+    -e HOME=/tmp \
     -v "${GONG_BE_DIR}/node_modules/ftdi-d2xx:/build/ftdi-d2xx" \
     ${DOCKER_IMAGE} \
     bash -c "
         cd /build/ftdi-d2xx && \
-        npm install && \
-        npm run cmake:rebuild-release && \
+        cmake-js rebuild && \
         chmod 755 build/Release/ftdi-d2xx.Linux.x86_64.node
     "
 

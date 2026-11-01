@@ -26,11 +26,8 @@ echo "[ftdi-d2xx] Building native binary inside container..."
 
 cd "${FTDI_DIR}"
 
-# Ensure dependencies installed
-npm install
-
 # Build release binary
-npm run cmake:rebuild-release
+npx --yes cmake-js rebuild
 
 if [ -f "${BINARY_PATH}" ]; then
   chmod 755 "${BINARY_PATH}"
