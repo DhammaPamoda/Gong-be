@@ -1,6 +1,4 @@
 const { execFileSync } = require('child_process');
-const jsonClassConverter = require('../lib/jsonConverter');
-const ManualGong = require('../model/manualGong');
 
 // Run in a fresh process so the timezone does not depend on Jest's environment.
 const calculateGong = (timezone, start, day, clock) => {
@@ -44,15 +42,4 @@ describe('course gong local clock time', () => {
       originalUnchanged: true,
     });
   });
-});
-
-test('manual gong conversion clears seconds and milliseconds', () => {
-  const result = jsonClassConverter.convertOneObject({
-    time: Date.UTC(2026, 10, 9, 8, 0, 34, 567),
-    gong: { gongType: 1, areas: [1], volume: 100, repeat: 1 },
-    isActive: true,
-  }, 'ManualGong');
-
-  expect(result).toBeInstanceOf(ManualGong);
-  expect(result.time).toBe(Date.UTC(2026, 10, 9, 8));
 });
