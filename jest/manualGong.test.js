@@ -1,15 +1,15 @@
 const { execFileSync } = require('child_process');
 const jsonClassConverter = require('../lib/jsonConverter');
-const TimedGong = require('../model/timedGong');
+const ManualGong = require('../model/manualGong');
 
 // Run in a fresh process so the timezone does not depend on Jest's environment.
 const calculateGong = (timezone, start, day, clock) => {
   const script = `
     const moment = require('moment');
-    const TimedGong = require(${JSON.stringify(require.resolve('../model/timedGong'))});
+    const ManualGong = require(${JSON.stringify(require.resolve('../model/manualGong'))});
     const [start, day, clock] = JSON.parse(process.argv[1]);
     const agendaTime = moment.duration(day + '.' + clock).asMilliseconds();
-    const original = new TimedGong(agendaTime, undefined, false);
+    const original = new ManualGong(agendaTime, undefined, false);
     const result = original.cloneWhileAddingTime(moment(start, 'YYYY-MM-DD').valueOf());
     process.stdout.write(JSON.stringify({
       time: new Date(result.time).toISOString(),
@@ -51,8 +51,8 @@ test('manual gong conversion clears seconds and milliseconds', () => {
     time: Date.UTC(2026, 10, 9, 8, 0, 34, 567),
     gong: { gongType: 1, areas: [1], volume: 100, repeat: 1 },
     isActive: true,
-  }, 'TimedGong');
+  }, 'ManualGong');
 
-  expect(result).toBeInstanceOf(TimedGong);
+  expect(result).toBeInstanceOf(ManualGong);
   expect(result.time).toBe(Date.UTC(2026, 10, 9, 8));
 });

@@ -1,6 +1,6 @@
 [
   {
-    "className": "TimedGong",
+    "className": "ManualGong",
     "propertyConversionArray": [
       {
         "propertyName": "time",

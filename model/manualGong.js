@@ -3,7 +3,7 @@ const Gong = require('./gong');
 
 const milSecInMin = 60000;
 
-module.exports = class TimedGong {
+module.exports = class ManualGong {
   constructor(aTime, aGong = new Gong(), aIsActive = true) {
     this.time = aTime;
     this.isActive = aIsActive;
@@ -25,12 +25,12 @@ module.exports = class TimedGong {
         .millisecond(0)
         .valueOf();
 
-      const newTimedGong = new TimedGong(
+      const newManualGong = new ManualGong(
         gongTime,
         this.gong,
         this.isActive,
       );
-      return newTimedGong;
+      return newManualGong;
     };
 
     this.toggleActive = () => {
