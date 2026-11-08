@@ -10,13 +10,19 @@ module.exports = class ManualGong {
     this.gong = aGong;
 
     this.cloneWhileAddingTime = (courseStartTimeInMSec, courseStartDateUtcOffsetInMinutes) => {
-      // Using moment to handle DST correctly by adding days as calendar days
+      // Agenda time encodes calendar days and a local clock time, not elapsed time.
       const daysOffset = Math.floor(this.time / (24 * 3600 * 1000));
       const msOffset = this.time % (24 * 3600 * 1000);
-      
+      const hours = Math.floor(msOffset / 3600000);
+      const minutes = Math.floor((msOffset % 3600000) / 60000);
+      const seconds = Math.floor((msOffset % 60000) / 1000);
+
       const gongTime = moment(courseStartTimeInMSec)
         .add(daysOffset, 'd')
-        .add(msOffset, 'ms')
+        .hour(hours)
+        .minute(minutes)
+        .second(seconds)
+        .millisecond(0)
         .valueOf();
 
       const newManualGong = new ManualGong(

@@ -94,10 +94,6 @@ const gracefulShutdown = (signal) => {
   server.close(() => {
     logger.log('info', 'HTTP server closed');
 
-    // Stop the schedule manager
-    scheduleManager.stop();
-    logger.log('info', 'Schedule manager stopped');
-
     // Cleanup audio processes
     relayAndSoundManager.forceCleanup();
     logger.log('info', 'Relay and sound manager cleaned up');
